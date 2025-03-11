@@ -1,0 +1,46 @@
+---
+description: Understanding Laravel resources directory
+globs: 
+alwaysApply: false
+---
+---
+description: Understanding Laravel resources directory
+globs: [resources/**/*]
+alwaysApply: false
+---
+
+# Laravel Resources Directory
+
+The resources directory contains all of your frontend assets like views, CSS, and JavaScript. It's where you define how your application looks and how users interact with it.
+
+## Directory Structure
+
+- `resources/views`: Contains Blade templates that render HTML
+- `resources/css`: Contains CSS stylesheets, often using frameworks like Tailwind
+- `resources/js`: Contains JavaScript files that provide client-side interactivity
+
+## Key Concepts
+
+### Views (Blade Templates)
+- Located in `resources/views`
+- Use Laravel's Blade templating engine
+- Files end with `.blade.php` extension
+- Can extend layouts and include partials
+- Convert PHP variables into HTML markup
+
+### CSS and JavaScript
+- Located in `resources/css` and `resources/js`
+- Compiled using Vite (defined in vite.config.js)
+- Entry points are defined in vite.config.js
+- Use `@vite` directive in Blade templates to include compiled assets
+
+### Asset Compilation
+- Vite processes these files into optimized assets for production
+- CSS can use preprocessors like Sass or PostCSS
+- JavaScript can use modern ES features and be bundled
+- Final compiled assets are stored in `public/build`
+
+### Tailwind CSS
+- Laravel 12 includes Tailwind CSS by default
+- Configuration typically in `tailwind.config.js`
+- Use utility classes in your Blade templates
