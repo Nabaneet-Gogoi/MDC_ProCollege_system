@@ -1,0 +1,134 @@
+---
+description: Description of the database in the project. keeps track of updates, make sure to keep it updated
+globs: 
+alwaysApply: false
+---
+# MDC ProCollege System Database Schema
+
+## Overview
+This document describes the database structure for the MDC ProCollege System, including all tables, their fields, and relationships.
+
+## Current Entities
+
+### Admin
+**Table name:** `admins`  
+**Description:** System administrators who manage the application  
+**Timestamps:** No  
+
+| Field | Type | Description | Constraints |
+|-------|------|-------------|------------|
+| admin_id | bigint | Primary identifier | Primary Key, Auto-increment |
+| email | string | Admin email address | Unique |
+| password | string | Encrypted password | Hashed using bcrypt |
+| phone_no | string | Contact number | Nullable |
+
+### College
+**Table name:** `colleges`  
+**Description:** Educational institutions managed in the system  
+**Timestamps:** Yes (created_at, updated_at)  
+
+| Field | Type | Description | Constraints |
+|-------|------|-------------|------------|
+| college_id | bigint | Primary identifier | Primary Key, Auto-increment |
+| college_name | string | Name of the college | Required |
+| state | string | State where college is located | Required |
+| district | string | District where college is located | Required |
+| type | enum | Type of college | Values: 'professional', 'MDC' |
+| phase | enum | Implementation phase | Values: '1', '2' |
+
+### Session
+**Table name:** `sessions`  
+**Description:** User session data for authentication  
+**Timestamps:** No  
+
+| Field | Type | Description | Constraints |
+|-------|------|-------------|------------|
+| id | string | Session identifier | Primary Key |
+| user_id | bigint | FK to users table | Nullable, Indexed |
+| ip_address | string | User's IP address | Nullable |
+| user_agent | text | User's browser info | Nullable |
+| payload | text | Session data | Required |
+| last_activity | integer | Timestamp of last activity | Indexed |
+
+## Planned Future Entities
+
+### Student
+**Description:** For storing student information
+**Potential Fields:**
+- student_id (PK)
+- name
+- email
+- phone
+- address
+- enrollment_date
+- college_id (FK to colleges table)
+
+**Relationships:**
+- Belongs to a College
+
+### Department
+**Description:** For college departments
+**Potential Fields:**
+- department_id (PK)
+- name
+- code
+- college_id (FK to colleges table)
+- head_of_department
+
+**Relationships:**
+- Belongs to a College
+
+### Course
+**Description:** For courses offered by colleges
+**Potential Fields:**
+- course_id (PK)
+- name
+- code
+- description
+- credits
+- department_id (FK to departments table)
+
+**Relationships:**
+- Belongs to a Department
+
+## Migration Files
+
+1. **create_admins_table**
+   - File: `database/migrations/2025_03_11_083657_create_admins_table.php`
+   - Creates the admin table for system administrators
+
+2. **create_sessions_table**
+   - File: `database/migrations/2025_03_11_093013_create_sessions_table.php`
+   - Creates the sessions table for auth sessions
+
+3. **create_colleges_table**
+   - File: `database/migrations/2025_03_12_075929_create_colleges_table.php`
+   - Creates the colleges table for educational institutions
+
+## Relationships Diagram
+
+```
+Admin
+  |
+  | (future) manages
+  v
+College
+  |
+  | (future) has many
+  v
+Department
+  |
+  | (future) has many
+  v
+Course
+  |
+  | (future) enrolled by many
+  v
+Student
+```
+
+## Notes
+- The system currently focuses on college management
+- Future development will include student, department, and course management
+- All tables use appropriate indexes for optimized queries
+- Soft deletes are planned for future entities to maintain data integrity 

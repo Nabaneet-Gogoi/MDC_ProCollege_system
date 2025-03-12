@@ -1,0 +1,100 @@
+{
+  "name": "MDC ProCollege System Backend Schema",
+  "description": "Documentation of all database tables, entities, and their relationships in the MDC ProCollege System",
+  "version": "1.0.0",
+  "updated": "2025-03-12",
+  "entities": [
+    {
+      "name": "Admin",
+      "table": "admins",
+      "description": "System administrators who manage the application",
+      "attributes": [
+        { "name": "admin_id", "type": "bigint", "primary": true, "autoIncrement": true },
+        { "name": "email", "type": "string", "unique": true },
+        { "name": "password", "type": "string", "hashed": true },
+        { "name": "phone_no", "type": "string", "nullable": true }
+      ],
+      "timestamps": false,
+      "relationships": []
+    },
+    {
+      "name": "College",
+      "table": "colleges",
+      "description": "Educational institutions managed in the system",
+      "attributes": [
+        { "name": "college_id", "type": "bigint", "primary": true, "autoIncrement": true },
+        { "name": "college_name", "type": "string" },
+        { "name": "state", "type": "string" },
+        { "name": "district", "type": "string" },
+        { "name": "type", "type": "enum", "values": ["professional", "MDC"], "description": "Professional or Model Degree College" },
+        { "name": "phase", "type": "enum", "values": ["1", "2"], "description": "Phase 1 or Phase 2" }
+      ],
+      "timestamps": true,
+      "relationships": []
+    },
+    {
+      "name": "Session",
+      "table": "sessions",
+      "description": "User session data for authentication",
+      "attributes": [
+        { "name": "id", "type": "string", "primary": true },
+        { "name": "user_id", "type": "bigint", "nullable": true, "references": { "table": "users", "column": "id" } },
+        { "name": "ip_address", "type": "string", "nullable": true },
+        { "name": "user_agent", "type": "text", "nullable": true },
+        { "name": "payload", "type": "text" },
+        { "name": "last_activity", "type": "integer", "indexed": true }
+      ],
+      "timestamps": false,
+      "relationships": []
+    }
+  ],
+  "plannedEntities": [
+    {
+      "name": "Student",
+      "description": "Future entity for storing student information",
+      "potentialAttributes": [
+        "student_id", "name", "email", "phone", "address", "enrollment_date", "college_id"
+      ],
+      "potentialRelationships": [
+        { "with": "College", "type": "belongsTo", "description": "Each student belongs to a college" }
+      ]
+    },
+    {
+      "name": "Department",
+      "description": "Future entity for college departments",
+      "potentialAttributes": [
+        "department_id", "name", "code", "college_id", "head_of_department"
+      ],
+      "potentialRelationships": [
+        { "with": "College", "type": "belongsTo", "description": "Each department belongs to a college" }
+      ]
+    },
+    {
+      "name": "Course",
+      "description": "Future entity for courses offered by colleges",
+      "potentialAttributes": [
+        "course_id", "name", "code", "description", "credits", "department_id"
+      ],
+      "potentialRelationships": [
+        { "with": "Department", "type": "belongsTo", "description": "Each course belongs to a department" }
+      ]
+    }
+  ],
+  "migrations": [
+    {
+      "name": "create_admins_table",
+      "filename": "database/migrations/2025_03_11_083657_create_admins_table.php",
+      "description": "Creates the admins table"
+    },
+    {
+      "name": "create_sessions_table",
+      "filename": "database/migrations/2025_03_11_093013_create_sessions_table.php",
+      "description": "Creates the sessions table for user sessions"
+    },
+    {
+      "name": "create_colleges_table", 
+      "filename": "database/migrations/2025_03_12_075929_create_colleges_table.php",
+      "description": "Creates the colleges table for educational institutions"
+    }
+  ]
+} 
