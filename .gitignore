@@ -1,3 +1,4 @@
+# Laravel
 /.phpunit.cache
 /node_modules
 /public/build
@@ -13,11 +14,32 @@
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
+auth.json
+
+# Node
 npm-debug.log
 yarn-error.log
-/auth.json
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+
+# IDEs and editors
 /.fleet
 /.idea
-/.nova
 /.vscode
+/.nova
 /.zed
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
