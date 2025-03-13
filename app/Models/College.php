@@ -54,4 +54,14 @@ class College extends Model
             '2' => 'Phase 2',
         ];
     }
+
+    /**
+     * Get the users associated with this college.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function users()
+    {
+        return $this->hasMany(User::class, 'college_id', 'college_id');
+    }
 }

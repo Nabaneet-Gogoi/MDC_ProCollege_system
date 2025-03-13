@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\Admin\CollegeController;
+use App\Http\Controllers\Admin\UserController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -40,5 +41,16 @@ Route::middleware(['web', 'admin.auth'])->prefix('admin')->group(function () {
         'edit' => 'admin.admins.edit',
         'update' => 'admin.admins.update',
         'destroy' => 'admin.admins.destroy',
+    ]);
+    
+    // User Management
+    Route::resource('users', UserController::class)->names([
+        'index' => 'admin.users.index',
+        'create' => 'admin.users.create',
+        'store' => 'admin.users.store',
+        'show' => 'admin.users.show',
+        'edit' => 'admin.users.edit',
+        'update' => 'admin.users.update',
+        'destroy' => 'admin.users.destroy',
     ]);
 });

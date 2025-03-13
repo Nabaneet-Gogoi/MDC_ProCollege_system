@@ -13,14 +13,22 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * The primary key for the model.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'user_id';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'email',
+        'username',
         'password',
+        'role',
+        'college_id',
     ];
 
     /**
@@ -41,8 +49,36 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the college associated with the user.
+     * Returns null for RUSA users who aren't associated with a specific college.
+     */
+    public function college()
+    {
+        return $this->belongsTo(College::class, 'college_id', 'college_id');
+    }
+
+    /**
+     * Check if the user is a college user.
+     *
+     * @return bool
+     */
+    public function isCollegeUser(): bool
+    {
+        return $this->role === 'college';
+    }
+
+    /**
+     * Check if the user is a RUSA user.
+     *
+     * @return bool
+     */
+    public function isRUSAUser(): bool
+    {
+        return $this->role === 'RUSA';
     }
 }

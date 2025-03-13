@@ -60,6 +60,26 @@
         </div>
         
         <div class="col-xl-3 col-md-6">
+            <div class="card bg-danger text-white mb-4 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1 opacity-75">Users</h6>
+                            <div class="h2 mb-0">24</div>
+                        </div>
+                        <div class="fs-1 opacity-50">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between bg-danger bg-opacity-75">
+                    <a class="small text-white stretched-link" href="{{ route('admin.users.index') }}">View Details</a>
+                    <div class="small text-white"><i class="bi bi-arrow-right"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
             <div class="card bg-warning text-white mb-4 h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -167,6 +187,10 @@
                         <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">
                             <i class="bi bi-plus-circle me-2 text-success"></i>
                             Add New College
+                        </a>
+                        <a href="{{ route('admin.users.index') }}" class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="bi bi-people me-2 text-info"></i>
+                            Manage Users
                         </a>
                         <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">
                             <i class="bi bi-receipt me-2 text-primary"></i>
