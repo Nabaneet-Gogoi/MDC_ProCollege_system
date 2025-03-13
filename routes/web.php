@@ -18,7 +18,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
 // Protected Admin Routes (require authentication)
 Route::middleware(['web', 'admin.auth'])->prefix('admin')->group(function () {
     Route::post('logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
-    Route::get('dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     
     // College Management
     Route::resource('colleges', CollegeController::class)->names([
@@ -32,5 +32,13 @@ Route::middleware(['web', 'admin.auth'])->prefix('admin')->group(function () {
     ]);
     
     // Admin Management
-    Route::resource('admins', AdminController::class)->except(['index']);
+    Route::resource('admins', AdminController::class)->names([
+        'index' => 'admin.admins.index',
+        'create' => 'admin.admins.create',
+        'store' => 'admin.admins.store',
+        'show' => 'admin.admins.show',
+        'edit' => 'admin.admins.edit',
+        'update' => 'admin.admins.update',
+        'destroy' => 'admin.admins.destroy',
+    ]);
 });
