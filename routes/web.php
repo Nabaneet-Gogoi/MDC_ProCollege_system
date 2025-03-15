@@ -10,6 +10,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Admin Root Route - Redirects based on authentication status
+Route::get('/admin', [AdminAuthController::class, 'redirectAdmin'])->name('admin.index');
+
 // Public Admin Routes (for guests)
 Route::middleware('web')->prefix('admin')->group(function () {
     Route::get('login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');

@@ -20,6 +20,22 @@ class AdminAuthController extends Controller
     }
 
     /**
+     * Redirect to the appropriate admin page based on authentication status.
+     * If user is authenticated, redirect to dashboard.
+     * Otherwise, redirect to login page.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function redirectAdmin()
+    {
+        if (Auth::guard('admin')->check()) {
+            return redirect()->route('admin.dashboard');
+        }
+        
+        return redirect()->route('admin.login');
+    }
+
+    /**
      * Show the admin login form.
      *
      * @return \Illuminate\View\View
@@ -72,7 +88,7 @@ class AdminAuthController extends Controller
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
-        return redirect()->route('admin.login');
+        
+        return redirect()->route('admin.login')->with('success', 'You have been logged out successfully');
     }
 }

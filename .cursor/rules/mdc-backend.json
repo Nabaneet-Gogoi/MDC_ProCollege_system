@@ -1,8 +1,8 @@
 {
   "name": "MDC ProCollege System Backend Schema",
   "description": "Documentation of all database tables, entities, and their relationships in the MDC ProCollege System",
-  "version": "1.0.0",
-  "updated": "2025-03-12",
+  "version": "1.1.0",
+  "updated": "2025-03-13",
   "entities": [
     {
       "name": "Admin",
@@ -30,7 +30,26 @@
         { "name": "phase", "type": "enum", "values": ["1", "2"], "description": "Phase 1 or Phase 2" }
       ],
       "timestamps": true,
-      "relationships": []
+      "relationships": [
+        { "with": "User", "type": "hasMany", "description": "A college can have multiple college-type users" }
+      ]
+    },
+    {
+      "name": "User",
+      "table": "users",
+      "description": "Users who can access the system (college staff or RUSA representatives)",
+      "attributes": [
+        { "name": "user_id", "type": "bigint", "primary": true, "autoIncrement": true },
+        { "name": "username", "type": "string", "unique": true },
+        { "name": "password", "type": "string", "hashed": true },
+        { "name": "role", "type": "enum", "values": ["college", "RUSA"], "description": "Type of user - college staff or RUSA representative" },
+        { "name": "college_id", "type": "bigint", "nullable": true, "references": { "table": "colleges", "column": "college_id" } },
+        { "name": "remember_token", "type": "string", "nullable": true }
+      ],
+      "timestamps": true,
+      "relationships": [
+        { "with": "College", "type": "belongsTo", "description": "A college-type user belongs to a college", "nullable": true }
+      ]
     },
     {
       "name": "Session",
@@ -49,6 +68,16 @@
     }
   ],
   "plannedEntities": [
+    {
+      "name": "Payment",
+      "description": "Future entity for recording payments from colleges",
+      "potentialAttributes": [
+        "payment_id", "college_id", "amount", "payment_date", "payment_method", "receipt_number", "description"
+      ],
+      "potentialRelationships": [
+        { "with": "College", "type": "belongsTo", "description": "Each payment is made by a college" }
+      ]
+    },
     {
       "name": "Student",
       "description": "Future entity for storing student information",
@@ -95,6 +124,11 @@
       "name": "create_colleges_table", 
       "filename": "database/migrations/2025_03_12_075929_create_colleges_table.php",
       "description": "Creates the colleges table for educational institutions"
+    },
+    {
+      "name": "create_users_table",
+      "filename": "database/migrations/2025_03_13_094852_create_users_table.php",
+      "description": "Creates the users table for college and RUSA users"
     }
   ]
 } 
