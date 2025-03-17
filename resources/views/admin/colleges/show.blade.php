@@ -73,11 +73,11 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <h5 class="text-muted">Created At</h5>
-                    <p class="fs-5">{{ $college->created_at->format('F d, Y h:i A') }}</p>
+                    <p class="fs-5">{{ $college->created_at ? $college->created_at->format('F d, Y h:i A') : 'Not available' }}</p>
                 </div>
                 <div class="col-md-6 mb-3">
                     <h5 class="text-muted">Last Updated</h5>
-                    <p class="fs-5">{{ $college->updated_at->format('F d, Y h:i A') }}</p>
+                    <p class="fs-5">{{ $college->updated_at ? $college->updated_at->format('F d, Y h:i A') : 'Not available' }}</p>
                 </div>
             </div>
         </div>

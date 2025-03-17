@@ -23,7 +23,7 @@ class CollegeController extends Controller
      */
     public function index()
     {
-        $colleges = College::orderBy('college_name')->paginate(10);
+        $colleges = College::orderBy('college_id')->paginate(10);
         return view('admin.colleges.index', compact('colleges'));
     }
 

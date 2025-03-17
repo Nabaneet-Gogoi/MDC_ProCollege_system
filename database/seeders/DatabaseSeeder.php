@@ -19,5 +19,10 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+        
+        // Call the college seeder to populate universities and colleges
+        $this->call([
+            CollegeSeeder::class,
+        ]);
     }
 }

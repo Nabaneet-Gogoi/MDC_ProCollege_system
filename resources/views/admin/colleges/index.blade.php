@@ -77,7 +77,7 @@
                 </table>
             </div>
             
-            <div class="mt-3">
+            <div class="d-flex justify-content-center mt-3">
                 {{ $colleges->links() }}
             </div>
         </div>
