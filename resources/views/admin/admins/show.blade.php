@@ -63,6 +63,11 @@
                         <i class="bi bi-trash"></i> Delete
                     </button>
                 </form>
+                @if(auth()->guard('admin')->user()->admin_id === $admin->admin_id)
+                    <div class="alert alert-warning mt-2">
+                        <i class="bi bi-exclamation-triangle-fill"></i> You cannot delete your own account while logged in.
+                    </div>
+                @endif
             </div>
         </div>
     </div>

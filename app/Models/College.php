@@ -64,4 +64,24 @@ class College extends Model
     {
         return $this->hasMany(User::class, 'college_id', 'college_id');
     }
+    
+    /**
+     * Get the funding record associated with this college.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function funding()
+    {
+        return $this->hasOne(Funding::class, 'college_id', 'college_id');
+    }
+    
+    /**
+     * Calculate funding amounts for this college based on type and phase.
+     * 
+     * @return array
+     */
+    public function calculateFundingAmounts()
+    {
+        return Funding::calculateFundingForCollege($this);
+    }
 }

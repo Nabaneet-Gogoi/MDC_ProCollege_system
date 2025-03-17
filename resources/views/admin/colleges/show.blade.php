@@ -65,7 +65,9 @@
                 <div class="col-md-6 mb-3">
                     <h5 class="text-muted">Phase</h5>
                     <p class="fs-5">
-                        <span class="badge bg-info">Phase {{ $college->phase }}</span>
+                        @if($college->type === 'MDC')
+                            <span class="badge bg-info">Phase {{ $college->phase }}</span>
+                        @endif
                     </p>
                 </div>
             </div>

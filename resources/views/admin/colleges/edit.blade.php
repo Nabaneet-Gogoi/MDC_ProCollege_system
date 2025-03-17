@@ -54,7 +54,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="type" class="form-label">College Type <span class="text-danger">*</span></label>
-                            <select class="form-select @error('type') is-invalid @enderror" id="type" name="type" required>
+                            <select class="form-select @error('type') is-invalid @enderror" id="type" name="type" required onchange="togglePhaseField()">
                                 <option value="">Select Type</option>
                                 @foreach($typeOptions as $value => $label)
                                     <option value="{{ $value }}" {{ old('type', $college->type) == $value ? 'selected' : '' }}>{{ $label }}</option>
@@ -65,10 +65,10 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6" id="phaseContainer" style="{{ $college->type === 'professional' ? 'display: none;' : '' }}">
                         <div class="mb-3">
                             <label for="phase" class="form-label">Phase <span class="text-danger">*</span></label>
-                            <select class="form-select @error('phase') is-invalid @enderror" id="phase" name="phase" required>
+                            <select class="form-select @error('phase') is-invalid @enderror" id="phase" name="phase" {{ $college->type === 'MDC' ? 'required' : '' }}>
                                 <option value="">Select Phase</option>
                                 @foreach($phaseOptions as $value => $label)
                                     <option value="{{ $value }}" {{ old('phase', $college->phase) == $value ? 'selected' : '' }}>{{ $label }}</option>
@@ -88,6 +88,24 @@
                     <a href="{{ route('admin.colleges.index') }}" class="btn btn-secondary">Cancel</a>
                 </div>
             </form>
+            
+            <script>
+                function togglePhaseField() {
+                    const typeSelect = document.getElementById('type');
+                    const phaseContainer = document.getElementById('phaseContainer');
+                    const phaseSelect = document.getElementById('phase');
+                    
+                    if (typeSelect.value === 'professional') {
+                        phaseContainer.style.display = 'none';
+                        phaseSelect.removeAttribute('required');
+                    } else {
+                        phaseContainer.style.display = 'block';
+                        phaseSelect.setAttribute('required', 'required');
+                    }
+                }
+                // Initialize on page load
+                document.addEventListener('DOMContentLoaded', togglePhaseField);
+            </script>
         </div>
     </div>
 @endsection 

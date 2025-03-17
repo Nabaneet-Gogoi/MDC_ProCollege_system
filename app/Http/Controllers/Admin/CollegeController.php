@@ -48,8 +48,12 @@ class CollegeController extends Controller
             'state' => 'required|string|max:100',
             'district' => 'required|string|max:100',
             'type' => 'required|in:professional,MDC',
-            'phase' => 'required|in:1,2',
+            'phase' => 'required_if:type,MDC|nullable|in:1,2',
         ]);
+
+        if ($request->type === 'professional') {
+            $validated['phase'] = null;
+        }
 
         College::create($validated);
 
@@ -87,8 +91,12 @@ class CollegeController extends Controller
             'state' => 'required|string|max:100',
             'district' => 'required|string|max:100',
             'type' => 'required|in:professional,MDC',
-            'phase' => 'required|in:1,2',
+            'phase' => 'required_if:type,MDC|nullable|in:1,2',
         ]);
+
+        if ($request->type === 'professional') {
+            $validated['phase'] = null;
+        }
 
         $college->update($validated);
 

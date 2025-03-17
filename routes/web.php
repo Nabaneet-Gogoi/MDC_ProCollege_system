@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\Admin\CollegeController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\FundingController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -56,4 +57,18 @@ Route::middleware(['web', 'admin.auth'])->prefix('admin')->group(function () {
         'update' => 'admin.users.update',
         'destroy' => 'admin.users.destroy',
     ]);
+    
+    // Funding Management
+    Route::resource('fundings', FundingController::class)->names([
+        'index' => 'admin.fundings.index',
+        'create' => 'admin.fundings.create',
+        'store' => 'admin.fundings.store',
+        'show' => 'admin.fundings.show',
+        'edit' => 'admin.fundings.edit',
+        'update' => 'admin.fundings.update',
+        'destroy' => 'admin.fundings.destroy',
+    ]);
+    
+    // Calculate funding for a college based on type and phase
+    Route::post('calculate-funding', [FundingController::class, 'calculateFunding'])->name('admin.fundings.calculate');
 });

@@ -65,6 +65,23 @@
       ],
       "timestamps": false,
       "relationships": []
+    },
+    {
+      "name": "Funding",
+      "table": "fundings",
+      "description": "Funding information for colleges based on type and phase",
+      "attributes": [
+        { "name": "funding_id", "type": "bigint", "primary": true, "autoIncrement": true },
+        { "name": "college_id", "type": "bigint", "references": { "table": "colleges", "column": "college_id" } },
+        { "name": "approved_amt", "type": "decimal", "description": "Total approved amount in crores" },
+        { "name": "central_share", "type": "decimal", "description": "Central government share amount" },
+        { "name": "state_share", "type": "decimal", "description": "State government share amount" },
+        { "name": "utilization_status", "type": "enum", "values": ["not_started", "in_progress", "completed"], "default": "not_started" }
+      ],
+      "timestamps": true,
+      "relationships": [
+        { "with": "College", "type": "belongsTo", "description": "A funding record belongs to a college" }
+      ]
     }
   ],
   "plannedEntities": [
@@ -129,6 +146,11 @@
       "name": "create_users_table",
       "filename": "database/migrations/2025_03_13_094852_create_users_table.php",
       "description": "Creates the users table for college and RUSA users"
+    },
+    {
+      "name": "create_fundings_table",
+      "filename": "database/migrations/2025_03_17_164552_create_fundings_table.php",
+      "description": "Creates the fundings table for college funding details"
     }
   ]
 } 
