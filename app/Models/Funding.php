@@ -45,6 +45,48 @@ class Funding extends Model
     }
     
     /**
+     * Get the releases for this funding.
+     */
+    public function releases()
+    {
+        return $this->hasMany(Release::class, 'funding_id', 'funding_id');
+    }
+    
+    /**
+     * Get the total amount released for this funding.
+     * 
+     * @return float
+     */
+    public function getTotalReleasedAttribute()
+    {
+        return $this->releases()->sum('release_amt');
+    }
+    
+    /**
+     * Get the remaining balance for this funding.
+     * 
+     * @return float
+     */
+    public function getRemainingBalanceAttribute()
+    {
+        return $this->approved_amt - $this->total_released;
+    }
+    
+    /**
+     * Get the percentage of funds utilized.
+     * 
+     * @return float
+     */
+    public function getUtilizationPercentageAttribute()
+    {
+        if ($this->approved_amt <= 0) {
+            return 0;
+        }
+        
+        return ($this->total_released / $this->approved_amt) * 100;
+    }
+    
+    /**
      * Calculate and set the funding amounts based on college type and phase.
      * 
      * MDC Phase 1: 8 crores (50:50)

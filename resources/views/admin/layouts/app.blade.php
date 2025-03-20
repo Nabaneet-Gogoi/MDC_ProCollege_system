@@ -222,6 +222,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.releases.*') ? 'active' : '' }}" href="{{ route('admin.releases.index') }}">
+                                <i class="bi bi-cash-coin"></i> Fund Releases
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="#">
                                 <i class="bi bi-gear"></i> Settings
                             </a>

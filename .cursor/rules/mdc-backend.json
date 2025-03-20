@@ -80,7 +80,25 @@
       ],
       "timestamps": true,
       "relationships": [
-        { "with": "College", "type": "belongsTo", "description": "A funding record belongs to a college" }
+        { "with": "College", "type": "belongsTo", "description": "A funding record belongs to a college" },
+        { "with": "Release", "type": "hasMany", "description": "A funding can have multiple releases" }
+      ]
+    },
+    {
+      "name": "Release",
+      "table": "releases",
+      "description": "Tracks payments/releases made against a funding budget",
+      "attributes": [
+        { "name": "release_id", "type": "bigint", "primary": true, "autoIncrement": true },
+        { "name": "release_amt", "type": "decimal", "description": "Amount released in crores" },
+        { "name": "release_date", "type": "date", "description": "Date when the amount was released" },
+        { "name": "funding_id", "type": "bigint", "references": { "table": "fundings", "column": "funding_id" } },
+        { "name": "desc", "type": "text", "description": "Description of the release" }
+      ],
+      "timestamps": true,
+      "relationships": [
+        { "with": "Funding", "type": "belongsTo", "description": "A release belongs to a funding allocation" },
+        { "with": "College", "type": "hasOneThrough", "description": "A release is associated with a college through funding" }
       ]
     }
   ],
@@ -151,6 +169,11 @@
       "name": "create_fundings_table",
       "filename": "database/migrations/2025_03_17_164552_create_fundings_table.php",
       "description": "Creates the fundings table for college funding details"
+    },
+    {
+      "name": "create_releases_table",
+      "filename": "database/migrations/2025_03_19_075555_create_releases_table.php",
+      "description": "Creates the releases table for tracking payments against funding"
     }
   ]
 } 

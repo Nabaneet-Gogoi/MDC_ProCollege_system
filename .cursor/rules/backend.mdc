@@ -36,6 +36,33 @@ This document describes the database structure for the MDC ProCollege System, in
 | type | enum | Type of college | Values: 'professional', 'MDC' |
 | phase | enum | Implementation phase | Values: '1', '2' |
 
+### Funding
+**Table name:** `fundings`  
+**Description:** Funding allocations for colleges  
+**Timestamps:** Yes (created_at, updated_at)  
+
+| Field | Type | Description | Constraints |
+|-------|------|-------------|------------|
+| funding_id | bigint | Primary identifier | Primary Key, Auto-increment |
+| college_id | bigint | Foreign key to colleges table | Foreign Key |
+| approved_amt | decimal | Total approved funding amount | Required |
+| central_share | decimal | Central government's share | Required |
+| state_share | decimal | State government's share | Required |
+| utilization_status | enum | Current utilization status | Values: 'not_started', 'in_progress', 'completed' |
+
+### Release
+**Table name:** `releases`  
+**Description:** Fund releases against allocated fundings  
+**Timestamps:** Yes (created_at, updated_at)  
+
+| Field | Type | Description | Constraints |
+|-------|------|-------------|------------|
+| release_id | bigint | Primary identifier | Primary Key, Auto-increment |
+| funding_id | bigint | Foreign key to fundings table | Foreign Key |
+| release_amt | decimal | Amount released | Required |
+| release_date | date | Date of fund release | Required |
+| desc | text | Description or purpose of rel
+
 ### Session
 **Table name:** `sessions`  
 **Description:** User session data for authentication  

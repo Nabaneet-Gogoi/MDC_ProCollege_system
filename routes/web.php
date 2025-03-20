@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\Admin\CollegeController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\FundingController;
+use App\Http\Controllers\Admin\ReleaseController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -71,4 +72,20 @@ Route::middleware(['web', 'admin.auth'])->prefix('admin')->group(function () {
     
     // Calculate funding for a college based on type and phase
     Route::post('calculate-funding', [FundingController::class, 'calculateFunding'])->name('admin.fundings.calculate');
+    
+    // Release Management
+    Route::resource('releases', ReleaseController::class)->names([
+        'index' => 'admin.releases.index',
+        'create' => 'admin.releases.create',
+        'store' => 'admin.releases.store',
+        'show' => 'admin.releases.show',
+        'edit' => 'admin.releases.edit',
+        'update' => 'admin.releases.update',
+        'destroy' => 'admin.releases.destroy',
+    ]);
+    
+    // Get funding details for release form
+    Route::post('get-funding-details', [ReleaseController::class, 'getFundingDetails'])->name('admin.releases.getFundingDetails');
+    // Add GET route for funding details as well
+    Route::get('funding-details/{id}', [ReleaseController::class, 'getFundingDetailsById'])->name('admin.releases.getFundingDetailsById');
 });
