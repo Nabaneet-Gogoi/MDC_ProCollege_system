@@ -18,35 +18,7 @@ This document describes the database structure for the MDC ProCollege System, in
 ### Admin
 **Table name:** `admins`  
 **Description:** System administrators who manage the application  
-**Timestamps:** No  
-
-| Field | Type | Description | Constraints |
-|-------|------|-------------|------------|
-| admin_id | bigint | Primary identifier | Primary Key, Auto-increment |
-| email | string | Admin email address | Unique |
-| password | string | Encrypted password | Hashed using bcrypt |
-| phone_no | string | Contact number | Nullable |
-
-### Admin
-**Table name:** `admins`  
-**Description:** System administrators who manage the application  
-**Timestamps:** No  
-
-| Field | Type | Description | Constraints |
-|-------|------|-------------|------------|
-| admin_id | bigint | Primary identifier | Primary Key, Auto-increment |
-| email | string | Admin email address | Unique |
-| password | string | Encrypted password | Hashed using bcrypt |
-| phone_no | string | Contact number | Nullable |
-
-### College
-
-// Change to:
-
-### Admin
-**Table name:** `admins`  
-**Description:** System administrators who manage the application  
-**Timestamps:** No  
+**Timestamps:** Yes (created_at, updated_at)  
 
 | Field | Type | Description | Constraints |
 |-------|------|-------------|------------|
