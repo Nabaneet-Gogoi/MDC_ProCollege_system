@@ -44,8 +44,6 @@ This document describes the database structure for the MDC ProCollege System, in
 | status | enum | Account status | Values: 'active', 'inactive', Default: 'active' |
 
 ### College
-
-### College
 **Table name:** `colleges`  
 **Description:** Educational institutions managed in the system  
 **Timestamps:** Yes (created_at, updated_at)  
@@ -182,12 +180,12 @@ This document describes the database structure for the MDC ProCollege System, in
    - File: `database/migrations/2025_03_13_094852_create_users_table.php`
    - Creates the users table for college staff members
 
-4. **create_fundings_table**
-   - File: `database/migrations/YYYY_MM_DD_create_fundings_table.php`
+5. **create_fundings_table**
+   - File: `database/migrations/2025_03_17_164552_create_fundings_table.php`
    - Creates the fundings table for college funding allocations
 
-5. **create_releases_table**
-   - File: `database/migrations/YYYY_MM_DD_create_releases_table.php`
+6. **create_releases_table**
+   - File: `database/migrations/2025_03_19_075555_create_releases_table.php`
    - Creates the releases table for fund release transactions
 
 7. **create_bills_table**
@@ -206,7 +204,6 @@ This document describes the database structure for the MDC ProCollege System, in
     - File: `database/migrations/2025_03_21_090248_create_physical_progress_table.php`
     - Creates the physical_progress table for tracking actual construction progress
 
-
 ## Relationships Diagram
 
 ```
@@ -215,16 +212,8 @@ Admin
   | manages
   v
 College
-  |------------------|
-  | has one          | has many
-  v                  v
-Funding            User
-  |
-  | has many
-  v
-Release
- |-------------------|------------------|
- | has one           | has many         | has many
+  |-------------------|------------------|
+  | has one           | has many         | has many
   v                   v                  v
 Funding            User              PhysicalProgress
   |                   |                  |
@@ -236,11 +225,10 @@ Release            Bill             WorkCategory
                     v                  |
                 BillProgress ----------|
                     | tracks progress of
-
 ```
 
 ## Notes
-- The system focuses on college management, funding, and construction
+- The system focuses on college management, funding, and construction progress tracking
 - Funding is allocated to colleges based on their type and phase:
   - MDC Phase 1: 8 crores (Central:State = 50:50)
   - MDC Phase 2: 12 crores (Central:State = 90:10)
@@ -251,6 +239,4 @@ Release            Bill             WorkCategory
 - Work is categorized (e.g., foundation, walls, roof) for detailed progress tracking
 - Bill progress tracks work reported with each bill submission
 - Physical progress tracks the actual construction progress verified on site
-- Future development will include student, department, and course management
 - All tables use appropriate indexes for optimized queries
-- Soft deletes are planned for future entities to maintain data integrity
