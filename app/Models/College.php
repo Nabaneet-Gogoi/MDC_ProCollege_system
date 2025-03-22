@@ -84,4 +84,12 @@ class College extends Model
     {
         return Funding::calculateFundingForCollege($this);
     }
+
+    /**
+     * Get the physical progress reports for this college.
+     */
+    public function physicalProgress()
+    {
+        return $this->hasMany(PhysicalProgress::class, 'college_id', 'college_id');
+    }
 }

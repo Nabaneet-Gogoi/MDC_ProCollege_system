@@ -124,4 +124,12 @@ class Funding extends Model
             'state_share' => $stateShare
         ];
     }
+    
+    /**
+     * Get the physical progress reports for this funding.
+     */
+    public function physicalProgress()
+    {
+        return $this->hasMany(PhysicalProgress::class, 'funding_id', 'funding_id');
+    }
 }

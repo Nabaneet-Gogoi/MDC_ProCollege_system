@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\Admin\CollegeController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\FundingController;
@@ -10,6 +11,13 @@ use App\Http\Controllers\Admin\ReleaseController;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+// User Authentication Routes
+Route::middleware('web')->group(function () {
+    Route::get('login', [UserAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [UserAuthController::class, 'login']);
+    Route::post('logout', [UserAuthController::class, 'logout'])->name('logout')->middleware('auth');
 });
 
 // Admin Root Route - Redirects based on authentication status
@@ -88,4 +96,23 @@ Route::middleware(['web', 'admin.auth'])->prefix('admin')->group(function () {
     Route::post('get-funding-details', [ReleaseController::class, 'getFundingDetails'])->name('admin.releases.getFundingDetails');
     // Add GET route for funding details as well
     Route::get('funding-details/{id}', [ReleaseController::class, 'getFundingDetailsById'])->name('admin.releases.getFundingDetailsById');
+    
+    // Bills Management
+    Route::resource('bills', 'App\Http\Controllers\Admin\BillController')->names([
+        'index' => 'admin.bills.index',
+        'create' => 'admin.bills.create',
+        'store' => 'admin.bills.store',
+        'show' => 'admin.bills.show',
+        'edit' => 'admin.bills.edit',
+        'update' => 'admin.bills.update',
+        'destroy' => 'admin.bills.destroy',
+    ]);
+    Route::patch('bills/{id}/status', 'App\Http\Controllers\Admin\BillController@updateStatus')->name('admin.bills.updateStatus');
+    Route::get('bills-filter', 'App\Http\Controllers\Admin\BillController@filter')->name('admin.bills.filter');
+});
+
+// College User Routes
+Route::middleware(['auth', 'role:college'])->prefix('college')->name('college.')->group(function () {
+    // Bills Routes
+    Route::resource('bills', 'App\Http\Controllers\College\BillController');
 });

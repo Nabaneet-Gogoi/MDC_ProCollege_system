@@ -118,6 +118,27 @@
                 </div>
             </div>
         </div>
+
+        <!-- Add Bills Management Card -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-info text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-file-earmark-text display-6"></i>
+                        </div>
+                        <div class="text-end">
+                            <h5 class="mb-0">Bills Management</h5>
+                            <div class="small">Manage college bills</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="{{ route('admin.bills.index') }}">View Bills</a>
+                    <div class="small text-white"><i class="bi bi-chevron-right"></i></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row">

@@ -3,6 +3,11 @@ description: Description of the database in the project. keeps track of updates,
 globs: 
 alwaysApply: false
 ---
+---
+description: Description of the database in the project. keeps track of updates, make sure to keep it updated
+globs: 
+alwaysApply: false
+---
 # MDC ProCollege System Database Schema
 
 ## Overview
@@ -21,6 +26,52 @@ This document describes the database structure for the MDC ProCollege System, in
 | email | string | Admin email address | Unique |
 | password | string | Encrypted password | Hashed using bcrypt |
 | phone_no | string | Contact number | Nullable |
+
+### Admin
+**Table name:** `admins`  
+**Description:** System administrators who manage the application  
+**Timestamps:** No  
+
+| Field | Type | Description | Constraints |
+|-------|------|-------------|------------|
+| admin_id | bigint | Primary identifier | Primary Key, Auto-increment |
+| email | string | Admin email address | Unique |
+| password | string | Encrypted password | Hashed using bcrypt |
+| phone_no | string | Contact number | Nullable |
+
+### College
+
+// Change to:
+
+### Admin
+**Table name:** `admins`  
+**Description:** System administrators who manage the application  
+**Timestamps:** No  
+
+| Field | Type | Description | Constraints |
+|-------|------|-------------|------------|
+| admin_id | bigint | Primary identifier | Primary Key, Auto-increment |
+| email | string | Admin email address | Unique |
+| password | string | Encrypted password | Hashed using bcrypt |
+| phone_no | string | Contact number | Nullable |
+
+### User
+**Table name:** `users`  
+**Description:** College users who can manage their college's funding and releases  
+**Timestamps:** Yes (created_at, updated_at)  
+
+| Field | Type | Description | Constraints |
+|-------|------|-------------|------------|
+| user_id | bigint | Primary identifier | Primary Key, Auto-increment |
+| college_id | bigint | Foreign key to colleges table | Foreign Key |
+| name | string | Full name of the user | Required |
+| email | string | User email address | Required, Unique |
+| password | string | Encrypted password | Hashed using bcrypt |
+| phone_no | string | Contact number | Required |
+| role | enum | User role in the system | Values: 'college_admin', 'staff' |
+| status | enum | Account status | Values: 'active', 'inactive', Default: 'active' |
+
+### College
 
 ### College
 **Table name:** `colleges`  
@@ -61,7 +112,71 @@ This document describes the database structure for the MDC ProCollege System, in
 | funding_id | bigint | Foreign key to fundings table | Foreign Key |
 | release_amt | decimal | Amount released | Required |
 | release_date | date | Date of fund release | Required |
-| desc | text | Description or purpose of rel
+| desc | text | Description or purpose of release | Required |
+
+### Bill
+**Table name:** `bills`  
+**Description:** Bills submitted by colleges for payment against funding  
+**Timestamps:** Yes (created_at, updated_at)  
+
+| Field | Type | Description | Constraints |
+|-------|------|-------------|------------|
+| bill_id | bigint | Primary identifier | Primary Key, Auto-increment |
+| college_id | bigint | Foreign key to colleges table | Foreign Key |
+| funding_id | bigint | Foreign key to fundings table | Foreign Key |
+| user_id | bigint | User who submitted the bill | Foreign Key |
+| bill_no | string | Unique bill number | Unique |
+| bill_amt | decimal | Bill amount in crores | Required |
+| bill_date | date | Date of the bill | Required |
+| bill_status | enum | Status of the bill | Values: 'pending', 'approved', 'rejected', 'paid', Default: 'pending' |
+| description | text | Details about the bill | Nullable |
+| admin_remarks | text | Feedback from admin | Nullable |
+
+### WorkCategory
+**Table name:** `work_categories`  
+**Description:** Categories of construction/development work  
+**Timestamps:** Yes (created_at, updated_at)  
+
+| Field | Type | Description | Constraints |
+|-------|------|-------------|------------|
+| category_id | bigint | Primary identifier | Primary Key, Auto-increment |
+| category_name | string | Name of the work category | Required |
+| description | text | Details about the category | Nullable |
+| is_active | boolean | Whether category is active | Default: true |
+
+### BillProgress
+**Table name:** `bill_progress`  
+**Description:** Progress of work reported with each bill  
+**Timestamps:** Yes (created_at, updated_at)  
+
+| Field | Type | Description | Constraints |
+|-------|------|-------------|------------|
+| progress_id | bigint | Primary identifier | Primary Key, Auto-increment |
+| bill_id | bigint | Foreign key to bills table | Foreign Key |
+| college_id | bigint | Foreign key to colleges table | Foreign Key |
+| category_id | bigint | Foreign key to work_categories table | Foreign Key |
+| completion_percent | decimal | Percentage of work completed | Required |
+| progress_status | enum | Status of progress | Values: 'not_started', 'in_progress', 'completed', Default: 'in_progress' |
+| description | text | Details about the progress | Nullable |
+
+### PhysicalProgress
+**Table name:** `physical_progress`  
+**Description:** Actual physical progress of construction/development work  
+**Timestamps:** Yes (created_at, updated_at)  
+
+| Field | Type | Description | Constraints |
+|-------|------|-------------|------------|
+| progress_id | bigint | Primary identifier | Primary Key, Auto-increment |
+| college_id | bigint | Foreign key to colleges table | Foreign Key |
+| funding_id | bigint | Foreign key to fundings table | Foreign Key |
+| category_id | bigint | Foreign key to work_categories table | Foreign Key |
+| report_date | date | Date of progress report | Required |
+| completion_percent | decimal | Percentage of completion | Default: 0 |
+| progress_status | enum | Status of progress | Values: 'not_started', 'in_progress', 'completed', Default: 'not_started' |
+| description | text | Details about the progress | Nullable |
+| reported_by | string | Person who reported progress | Nullable |
+| verified_by | string | Person who verified progress | Nullable |
+| verification_date | date | Date of verification | Nullable |
 
 ### Session
 **Table name:** `sessions`  
@@ -77,47 +192,6 @@ This document describes the database structure for the MDC ProCollege System, in
 | payload | text | Session data | Required |
 | last_activity | integer | Timestamp of last activity | Indexed |
 
-## Planned Future Entities
-
-### Student
-**Description:** For storing student information
-**Potential Fields:**
-- student_id (PK)
-- name
-- email
-- phone
-- address
-- enrollment_date
-- college_id (FK to colleges table)
-
-**Relationships:**
-- Belongs to a College
-
-### Department
-**Description:** For college departments
-**Potential Fields:**
-- department_id (PK)
-- name
-- code
-- college_id (FK to colleges table)
-- head_of_department
-
-**Relationships:**
-- Belongs to a College
-
-### Course
-**Description:** For courses offered by colleges
-**Potential Fields:**
-- course_id (PK)
-- name
-- code
-- description
-- credits
-- department_id (FK to departments table)
-
-**Relationships:**
-- Belongs to a Department
-
 ## Migration Files
 
 1. **create_admins_table**
@@ -132,30 +206,79 @@ This document describes the database structure for the MDC ProCollege System, in
    - File: `database/migrations/2025_03_12_075929_create_colleges_table.php`
    - Creates the colleges table for educational institutions
 
+4. **create_users_table**
+   - File: `database/migrations/2025_03_13_094852_create_users_table.php`
+   - Creates the users table for college staff members
+
+4. **create_fundings_table**
+   - File: `database/migrations/YYYY_MM_DD_create_fundings_table.php`
+   - Creates the fundings table for college funding allocations
+
+5. **create_releases_table**
+   - File: `database/migrations/YYYY_MM_DD_create_releases_table.php`
+   - Creates the releases table for fund release transactions
+
+7. **create_bills_table**
+   - File: `database/migrations/2025_03_21_083533_create_bills_table.php`
+   - Creates the bills table for tracking college bill submissions
+
+8. **create_bill_progress_table**
+   - File: `database/migrations/2025_03_21_083653_create_bill_progress_table.php`
+   - Creates the bill_progress table for tracking work progress reported with bills
+
+9. **create_work_categories_table**
+   - File: `database/migrations/2025_03_21_083747_create_work_categories_table.php`
+   - Creates the work_categories table for categorizing construction work
+
+10. **create_physical_progress_table**
+    - File: `database/migrations/2025_03_21_090248_create_physical_progress_table.php`
+    - Creates the physical_progress table for tracking actual construction progress
+
+
 ## Relationships Diagram
 
 ```
 Admin
   |
-  | (future) manages
+  | manages
   v
 College
+  |------------------|
+  | has one          | has many
+  v                  v
+Funding            User
   |
-  | (future) has many
+  | has many
   v
-Department
-  |
-  | (future) has many
-  v
-Course
-  |
-  | (future) enrolled by many
-  v
-Student
+Release
+ |-------------------|------------------|
+ | has one           | has many         | has many
+  v                   v                  v
+Funding            User              PhysicalProgress
+  |                   |                  |
+  | has many          | submits          | belongs to
+  v                   v                  v
+Release            Bill             WorkCategory
+                    |                  ^
+                    | has many         |
+                    v                  |
+                BillProgress ----------|
+                    | tracks progress of
+
 ```
 
 ## Notes
-- The system currently focuses on college management
+- The system focuses on college management, funding, and construction
+- Funding is allocated to colleges based on their type and phase:
+  - MDC Phase 1: 8 crores (Central:State = 50:50)
+  - MDC Phase 2: 12 crores (Central:State = 90:10)
+  - Professional: 26 crores (Central:State = 90:10)
+- Fund releases are tracked against funding allocations with remaining balance calculations
+- Bills are submitted by colleges for construction work and require admin approval
+- Physical progress of construction is tracked separately from bills
+- Work is categorized (e.g., foundation, walls, roof) for detailed progress tracking
+- Bill progress tracks work reported with each bill submission
+- Physical progress tracks the actual construction progress verified on site
 - Future development will include student, department, and course management
 - All tables use appropriate indexes for optimized queries
-- Soft deletes are planned for future entities to maintain data integrity 
+- Soft deletes are planned for future entities to maintain data integrity
