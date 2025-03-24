@@ -38,7 +38,7 @@ class UserAuthController extends Controller
             
             // Redirect based on user role
             if ($user->isCollegeUser()) {
-                return redirect()->intended('/');
+                return redirect()->route('college.dashboard');
             } elseif ($user->isRUSAUser()) {
                 return redirect()->intended('/');
             }

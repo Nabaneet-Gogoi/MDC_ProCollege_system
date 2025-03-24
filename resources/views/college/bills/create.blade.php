@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('college.layouts.app')
 
 @section('title', 'Submit New Bill')
 

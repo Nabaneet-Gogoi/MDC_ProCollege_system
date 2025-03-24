@@ -113,6 +113,9 @@ Route::middleware(['web', 'admin.auth'])->prefix('admin')->group(function () {
 
 // College User Routes
 Route::middleware(['auth', 'role:college'])->prefix('college')->name('college.')->group(function () {
+    // Dashboard Route
+    Route::get('dashboard', 'App\Http\Controllers\College\DashboardController@index')->name('dashboard');
+    
     // Bills Routes
     Route::resource('bills', 'App\Http\Controllers\College\BillController');
 });

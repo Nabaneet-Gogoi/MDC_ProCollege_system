@@ -35,6 +35,10 @@ class CheckUserRole
         }
         
         // Redirect or abort based on unauthorized access
+        if ($user->isCollegeUser()) {
+            return redirect()->route('college.dashboard')->with('error', 'You do not have permission to access that resource.');
+        }
+        
         return abort(403, 'Unauthorized action.');
     }
 } 

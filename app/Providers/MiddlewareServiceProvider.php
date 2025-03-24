@@ -19,6 +19,7 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\AdminAuthentication;
+use App\Http\Middleware\CheckUserRole;
 
 class MiddlewareServiceProvider extends ServiceProvider
 {
@@ -62,5 +63,6 @@ class MiddlewareServiceProvider extends ServiceProvider
         
         // Register our custom admin middleware
         $this->app['router']->aliasMiddleware('admin.auth', AdminAuthentication::class);
+        $this->app['router']->aliasMiddleware('role', CheckUserRole::class);
     }
 } 
