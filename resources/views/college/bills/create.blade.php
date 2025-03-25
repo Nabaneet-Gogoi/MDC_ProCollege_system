@@ -90,6 +90,9 @@
                                                     <option value="{{ $id }}">{{ $name }}</option>
                                                 @endforeach
                                             </select>
+                                            <div class="form-text previous-progress-info" id="previous_progress_info_0">
+                                                <!-- Previous progress info will be displayed here -->
+                                            </div>
                                         </div>
                                         
                                         <div class="col-md-4 mb-3">
@@ -141,6 +144,21 @@
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Store previous progress data in JavaScript object
+        const previousProgressData = {
+            @foreach($latestProgressByCategory as $categoryId => $progress)
+                {{ $categoryId }}: {
+                    completion_percent: {{ $progress['completion_percent'] }},
+                    progress_status: "{{ $progress['progress_status'] }}",
+                    @if(isset($progress['bill_no']))
+                    source: "Bill #{{ $progress['bill_no'] }} ({{ $progress['bill_date'] }})"
+                    @else
+                    source: "Progress Report ({{ $progress['report_date'] }})"
+                    @endif
+                },
+            @endforeach
+        };
+
         // Bill amount validation against available released funds
         const fundingSelect = document.getElementById('funding_id');
         const billAmountInput = document.getElementById('bill_amt');
@@ -177,6 +195,71 @@
                 validateBillAmount();
             }
         });
+
+        // Function to update progress info and auto-populate fields based on selected category
+        function updateProgressInfo(selectElement, index) {
+            const categoryId = selectElement.value;
+            const infoElement = document.getElementById(`previous_progress_info_${index}`);
+            const completionInput = document.getElementById(`completion_percent_${index}`);
+            const statusSelect = document.getElementById(`progress_status_${index}`);
+            
+            // Clear previous info
+            infoElement.innerHTML = '';
+            
+            // If we have previous data for this category
+            if (categoryId && previousProgressData[categoryId]) {
+                const prevData = previousProgressData[categoryId];
+                let statusText = '';
+                
+                switch(prevData.progress_status) {
+                    case 'not_started':
+                        statusText = 'Not Started';
+                        break;
+                    case 'in_progress':
+                        statusText = 'In Progress';
+                        break;
+                    case 'completed':
+                        statusText = 'Completed';
+                        break;
+                    default:
+                        statusText = prevData.progress_status;
+                }
+                
+                // Display previous progress info
+                infoElement.innerHTML = `
+                    <div class="alert alert-info py-1 px-2 mt-2 mb-0 small">
+                        <i class="bi bi-info-circle"></i> Previous progress: <strong>${prevData.completion_percent}%</strong> 
+                        (${statusText}) from ${prevData.source}
+                    </div>
+                `;
+                
+                // Auto-populate with at least the previous percentage (can't go backwards)
+                if (!completionInput.getAttribute('data-user-changed')) {
+                    completionInput.value = prevData.completion_percent;
+                    
+                    // Set status based on previous status, but don't downgrade status
+                    if (prevData.progress_status === 'completed') {
+                        statusSelect.value = 'completed';
+                    } else if (prevData.progress_status === 'in_progress') {
+                        statusSelect.value = 'in_progress';
+                    }
+                }
+            }
+        }
+        
+        // Add event listener for category changes
+        document.querySelectorAll('.category-select').forEach((select, index) => {
+            select.addEventListener('change', function() {
+                updateProgressInfo(this, index);
+            });
+        });
+        
+        // Mark completion percentage as user-changed when modified
+        document.addEventListener('input', function(e) {
+            if (e.target.id && e.target.id.startsWith('completion_percent_')) {
+                e.target.setAttribute('data-user-changed', 'true');
+            }
+        });
         
         // Add more progress items
         let progressCounter = 1;
@@ -199,6 +282,9 @@
                                     <option value="{{ $id }}">{{ $name }}</option>
                                 @endforeach
                             </select>
+                            <div class="form-text previous-progress-info" id="previous_progress_info_${progressCounter}">
+                                <!-- Previous progress info will be displayed here -->
+                            </div>
                         </div>
                         
                         <div class="col-md-4 mb-3">
@@ -235,6 +321,13 @@
             `;
             
             container.appendChild(progressItem);
+            
+            // Add event listener for category change on new item
+            const newCategorySelect = document.getElementById(`category_id_${progressCounter}`);
+            newCategorySelect.addEventListener('change', function() {
+                updateProgressInfo(this, progressCounter);
+            });
+            
             progressCounter++;
             
             // Add event listeners for remove buttons

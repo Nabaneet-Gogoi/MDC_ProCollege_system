@@ -10,6 +10,7 @@ use App\Models\Funding;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\PhysicalProgress;
 
 class BillController extends Controller
 {
@@ -51,7 +52,45 @@ class BillController extends Controller
         // Get work categories for dropdown
         $categories = WorkCategory::getCategoriesForDropdown();
         
-        return view('college.bills.create', compact('fundings', 'categories'));
+        // Get latest completion percentages for each work category from previous bills
+        $latestProgressByCategory = [];
+        $workCategories = WorkCategory::where('is_active', true)->get();
+        
+        foreach ($workCategories as $category) {
+            // Find latest approved bill progress for this category
+            $latestProgress = BillProgress::whereHas('bill', function($query) use ($collegeId) {
+                    $query->where('college_id', $collegeId)
+                          ->whereIn('bill_status', ['approved', 'paid']);
+                })
+                ->where('category_id', $category->category_id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            
+            if ($latestProgress) {
+                $latestProgressByCategory[$category->category_id] = [
+                    'completion_percent' => $latestProgress->completion_percent,
+                    'progress_status' => $latestProgress->progress_status,
+                    'bill_no' => $latestProgress->bill->bill_no,
+                    'bill_date' => $latestProgress->bill->bill_date->format('d M Y')
+                ];
+            } else {
+                // Check physical progress if no bill progress exists
+                $physicalProgress = PhysicalProgress::where('college_id', $collegeId)
+                    ->where('category_id', $category->category_id)
+                    ->orderBy('report_date', 'desc')
+                    ->first();
+                
+                if ($physicalProgress) {
+                    $latestProgressByCategory[$category->category_id] = [
+                        'completion_percent' => $physicalProgress->completion_percent,
+                        'progress_status' => $physicalProgress->progress_status,
+                        'report_date' => $physicalProgress->report_date->format('d M Y')
+                    ];
+                }
+            }
+        }
+        
+        return view('college.bills.create', compact('fundings', 'categories', 'latestProgressByCategory'));
     }
 
     /**
@@ -72,6 +111,45 @@ class BillController extends Controller
             'progress.*.progress_status' => 'required|in:not_started,in_progress,completed',
             'progress.*.description' => 'nullable|string|max:500',
         ]);
+        
+        $collegeId = $request->college_id;
+        
+        // Validate that completion percentages don't decrease
+        $validationErrors = [];
+        foreach ($request->progress as $index => $progressData) {
+            $categoryId = $progressData['category_id'];
+            $newCompletionPercent = (float)$progressData['completion_percent'];
+            
+            // Find the latest progress for this category
+            $latestProgress = BillProgress::whereHas('bill', function($query) use ($collegeId) {
+                    $query->where('college_id', $collegeId)
+                          ->whereIn('bill_status', ['approved', 'paid']);
+                })
+                ->where('category_id', $categoryId)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            
+            if ($latestProgress && $newCompletionPercent < (float)$latestProgress->completion_percent) {
+                $validationErrors["progress.{$index}.completion_percent"] = "Completion percentage cannot be less than the previous value of {$latestProgress->completion_percent}%";
+                continue;
+            }
+            
+            // If no bill progress, check physical progress
+            if (!$latestProgress) {
+                $physicalProgress = PhysicalProgress::where('college_id', $collegeId)
+                    ->where('category_id', $categoryId)
+                    ->orderBy('report_date', 'desc')
+                    ->first();
+                
+                if ($physicalProgress && $newCompletionPercent < (float)$physicalProgress->completion_percent) {
+                    $validationErrors["progress.{$index}.completion_percent"] = "Completion percentage cannot be less than the previous value of {$physicalProgress->completion_percent}%";
+                }
+            }
+        }
+        
+        if (!empty($validationErrors)) {
+            return back()->withInput()->withErrors($validationErrors);
+        }
         
         // Get the funding
         $funding = Funding::findOrFail($request->funding_id);
@@ -190,7 +268,47 @@ class BillController extends Controller
         
         $categories = WorkCategory::getCategoriesForDropdown();
         
-        return view('college.bills.edit', compact('bill', 'categories'));
+        // Get latest completion percentages for each work category
+        // Here we're looking for the progress that was before this bill
+        $latestProgressByCategory = [];
+        $workCategories = WorkCategory::where('is_active', true)->get();
+        
+        foreach ($workCategories as $category) {
+            // Get latest approved bill progress for this category (excluding current bill)
+            $latestProgress = BillProgress::whereHas('bill', function($query) use ($collegeId, $id) {
+                    $query->where('college_id', $collegeId)
+                         ->where('bill_id', '!=', $id)
+                         ->whereIn('bill_status', ['approved', 'paid']);
+                })
+                ->where('category_id', $category->category_id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            
+            if ($latestProgress) {
+                $latestProgressByCategory[$category->category_id] = [
+                    'completion_percent' => $latestProgress->completion_percent,
+                    'progress_status' => $latestProgress->progress_status,
+                    'bill_no' => $latestProgress->bill->bill_no,
+                    'bill_date' => $latestProgress->bill->bill_date->format('d M Y')
+                ];
+            } else {
+                // Check physical progress if no bill progress exists
+                $physicalProgress = PhysicalProgress::where('college_id', $collegeId)
+                    ->where('category_id', $category->category_id)
+                    ->orderBy('report_date', 'desc')
+                    ->first();
+                
+                if ($physicalProgress) {
+                    $latestProgressByCategory[$category->category_id] = [
+                        'completion_percent' => $physicalProgress->completion_percent,
+                        'progress_status' => $physicalProgress->progress_status,
+                        'report_date' => $physicalProgress->report_date->format('d M Y')
+                    ];
+                }
+            }
+        }
+        
+        return view('college.bills.edit', compact('bill', 'categories', 'latestProgressByCategory'));
     }
 
     /**
@@ -221,6 +339,50 @@ class BillController extends Controller
             'progress.*.progress_status' => 'required|in:not_started,in_progress,completed',
             'progress.*.description' => 'nullable|string|max:500',
         ]);
+        
+        // Validate that completion percentages don't decrease from previous approved values
+        $validationErrors = [];
+        foreach ($request->progress as $index => $progressData) {
+            $categoryId = $progressData['category_id'];
+            $newCompletionPercent = (float)$progressData['completion_percent'];
+            $progressId = $progressData['progress_id'] ?? null;
+            
+            // Skip validation for the current progress items
+            if ($progressId) {
+                continue;
+            }
+            
+            // Find the latest progress for this category (excluding current bill)
+            $latestProgress = BillProgress::whereHas('bill', function($query) use ($collegeId, $id) {
+                    $query->where('college_id', $collegeId)
+                          ->where('bill_id', '!=', $id)
+                          ->whereIn('bill_status', ['approved', 'paid']);
+                })
+                ->where('category_id', $categoryId)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            
+            if ($latestProgress && $newCompletionPercent < (float)$latestProgress->completion_percent) {
+                $validationErrors["progress.{$index}.completion_percent"] = "Completion percentage cannot be less than the previous value of {$latestProgress->completion_percent}%";
+                continue;
+            }
+            
+            // If no bill progress, check physical progress
+            if (!$latestProgress) {
+                $physicalProgress = PhysicalProgress::where('college_id', $collegeId)
+                    ->where('category_id', $categoryId)
+                    ->orderBy('report_date', 'desc')
+                    ->first();
+                
+                if ($physicalProgress && $newCompletionPercent < (float)$physicalProgress->completion_percent) {
+                    $validationErrors["progress.{$index}.completion_percent"] = "Completion percentage cannot be less than the previous value of {$physicalProgress->completion_percent}%";
+                }
+            }
+        }
+        
+        if (!empty($validationErrors)) {
+            return back()->withInput()->withErrors($validationErrors);
+        }
         
         // Begin transaction
         DB::beginTransaction();

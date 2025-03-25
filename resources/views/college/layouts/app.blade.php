@@ -213,7 +213,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('college.profile.*') ? 'active' : '' }}" href="{{ route('college.profile.index') }}">
-                                <i class="bi bi-building"></i> College Profile
+                            <i class="bi bi-building-add"></i>College Profile
                             </a>
                         </li>
                         <li class="nav-item">
