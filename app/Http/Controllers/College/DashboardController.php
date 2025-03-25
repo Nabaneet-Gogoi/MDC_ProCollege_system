@@ -38,17 +38,29 @@ class DashboardController extends Controller
         $fundingInfo = Funding::where('college_id', $collegeId)
             ->select(
                 DB::raw('SUM(approved_amt) as total_funding'),
-                DB::raw('(SELECT SUM(bill_amt) FROM bills WHERE college_id = '.$collegeId.') as utilized_funding')
+                DB::raw('(SELECT SUM(bill_amt) FROM bills WHERE college_id = '.$collegeId.' AND bill_status = "approved") as utilized_funding')
             )
             ->first();
         
         $totalFunding = $fundingInfo->total_funding ?? 0;
         $utilizedFunding = $fundingInfo->utilized_funding ?? 0;
         
+        // Get released funding amount
+        $releasedFunding = DB::table('releases')
+            ->join('fundings', 'releases.funding_id', '=', 'fundings.funding_id')
+            ->where('fundings.college_id', $collegeId)
+            ->sum('releases.release_amt');
+        
         // Calculate funding utilization percentage
         $fundingUtilizationPercent = 0;
+        if ($releasedFunding > 0) {
+            $fundingUtilizationPercent = round(($utilizedFunding / $releasedFunding) * 100, 2);
+        }
+        
+        // Calculate funding release percentage
+        $fundingReleasePercent = 0;
         if ($totalFunding > 0) {
-            $fundingUtilizationPercent = round(($utilizedFunding / $totalFunding) * 100, 2);
+            $fundingReleasePercent = round(($releasedFunding / $totalFunding) * 100, 2);
         }
         
         return view('college.dashboard', compact(
@@ -56,8 +68,10 @@ class DashboardController extends Controller
             'pendingBills',
             'recentBills',
             'totalFunding',
+            'releasedFunding',
             'utilizedFunding',
-            'fundingUtilizationPercent'
+            'fundingUtilizationPercent',
+            'fundingReleasePercent'
         ));
     }
 } 

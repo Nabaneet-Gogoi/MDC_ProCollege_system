@@ -116,6 +116,12 @@ Route::middleware(['auth', 'role:college'])->prefix('college')->name('college.')
     // Dashboard Route
     Route::get('dashboard', 'App\Http\Controllers\College\DashboardController@index')->name('dashboard');
     
+    // Profile Routes
+    Route::get('profile', 'App\Http\Controllers\College\ProfileController@index')->name('profile.index');
+    Route::put('profile/update', 'App\Http\Controllers\College\ProfileController@update')->name('profile.update');
+    Route::get('profile/change-password', 'App\Http\Controllers\College\ProfileController@showChangePasswordForm')->name('profile.change-password');
+    Route::put('profile/update-password', 'App\Http\Controllers\College\ProfileController@updatePassword')->name('profile.update-password');
+    
     // Bills Routes
     Route::resource('bills', 'App\Http\Controllers\College\BillController');
 });

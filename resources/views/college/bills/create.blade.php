@@ -32,13 +32,18 @@
                                     <option value="">-- Select Funding --</option>
                                     @foreach($fundings as $funding)
                                         <option value="{{ $funding->funding_id }}" {{ old('funding_id') == $funding->funding_id ? 'selected' : '' }}>
-                                            {{ $funding->college->college_name }} - ₹{{ $funding->approved_amt }} Cr (Balance: ₹{{ $funding->remaining_balance }} Cr)
+                                            {{ $funding->college->college_name }} - 
+                                            Released: ₹{{ $funding->total_released }} Cr, 
+                                            Available: ₹{{ number_format($funding->available_released, 2) }} Cr
                                         </option>
                                     @endforeach
                                 </select>
                                 @error('funding_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                                <div class="form-text text-muted">
+                                    Note: Bill amount cannot exceed the available released funds.
+                                </div>
                             </div>
                             
                             <div class="col-md-4">
@@ -136,6 +141,43 @@
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Bill amount validation against available released funds
+        const fundingSelect = document.getElementById('funding_id');
+        const billAmountInput = document.getElementById('bill_amt');
+        
+        // Function to validate bill amount
+        function validateBillAmount() {
+            const selectedOption = fundingSelect.options[fundingSelect.selectedIndex];
+            
+            if (selectedOption && selectedOption.value) {
+                // Extract the available amount from the option text
+                const optionText = selectedOption.text;
+                const availableMatch = optionText.match(/Available: ₹([\d.]+)/);
+                
+                if (availableMatch && availableMatch[1]) {
+                    const availableAmount = parseFloat(availableMatch[1].replace(/,/g, ''));
+                    const billAmount = parseFloat(billAmountInput.value);
+                    
+                    if (billAmount > availableAmount) {
+                        alert('Bill amount cannot exceed the available released funds of ₹' + availableAmount.toFixed(2) + ' Cr');
+                        billAmountInput.value = availableAmount.toFixed(2);
+                    }
+                }
+            }
+        }
+        
+        // Add event listeners for validation
+        fundingSelect.addEventListener('change', validateBillAmount);
+        billAmountInput.addEventListener('change', validateBillAmount);
+        billAmountInput.addEventListener('blur', validateBillAmount);
+        
+        // Form submission validation
+        document.querySelector('form').addEventListener('submit', function(event) {
+            if (fundingSelect.value) {
+                validateBillAmount();
+            }
+        });
+        
         // Add more progress items
         let progressCounter = 1;
         
@@ -202,32 +244,6 @@
                 });
             });
         });
-        
-        // Funding amount validation
-        const fundingSelect = document.getElementById('funding_id');
-        const billAmountInput = document.getElementById('bill_amt');
-        
-        billAmountInput.addEventListener('change', validateBillAmount);
-        fundingSelect.addEventListener('change', validateBillAmount);
-        
-        function validateBillAmount() {
-            const selectedOption = fundingSelect.options[fundingSelect.selectedIndex];
-            if (!selectedOption.value) return;
-            
-            // Extract the balance amount from the option text
-            const optionText = selectedOption.text;
-            const balanceMatch = optionText.match(/Balance: ₹([\d.]+)/);
-            
-            if (balanceMatch && balanceMatch[1]) {
-                const balance = parseFloat(balanceMatch[1]);
-                const billAmount = parseFloat(billAmountInput.value);
-                
-                if (billAmount > balance) {
-                    alert('Bill amount cannot exceed the remaining balance of ₹' + balance + ' Cr');
-                    billAmountInput.value = balance;
-                }
-            }
-        }
     });
 </script>
 @endsection 

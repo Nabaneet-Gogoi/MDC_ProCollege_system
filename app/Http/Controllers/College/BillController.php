@@ -39,6 +39,15 @@ class BillController extends Controller
             ->whereRaw('approved_amt > (SELECT COALESCE(SUM(bill_amt), 0) FROM bills WHERE funding_id = fundings.funding_id)')
             ->get();
             
+        // Calculate available released funds for each funding
+        foreach ($fundings as $funding) {
+            $totalUtilized = Bill::where('funding_id', $funding->funding_id)
+                ->where('bill_status', '!=', 'rejected')
+                ->sum('bill_amt');
+                
+            $funding->available_released = $funding->total_released - $totalUtilized;
+        }
+        
         // Get work categories for dropdown
         $categories = WorkCategory::getCategoriesForDropdown();
         
@@ -64,8 +73,28 @@ class BillController extends Controller
             'progress.*.description' => 'nullable|string|max:500',
         ]);
         
-        // Validate funding has enough balance
+        // Get the funding
         $funding = Funding::findOrFail($request->funding_id);
+        
+        // Check total released amount
+        $totalReleased = $funding->total_released;
+        
+        // Get total utilized amount for this funding
+        $totalUtilized = Bill::where('funding_id', $request->funding_id)
+            ->where('bill_status', '!=', 'rejected')
+            ->sum('bill_amt');
+        
+        // Calculate available amount for billing
+        $availableAmount = $totalReleased - $totalUtilized;
+        
+        // Check if bill amount exceeds available released funds
+        if ($request->bill_amt > $availableAmount) {
+            return back()->withInput()->withErrors([
+                'bill_amt' => "Bill amount (₹{$request->bill_amt} Cr) cannot exceed the available released funds (₹{$availableAmount} Cr)"
+            ]);
+        }
+        
+        // Validate funding has enough balance
         $remainingBalance = $funding->remaining_balance;
         
         if ($request->bill_amt > $remainingBalance) {

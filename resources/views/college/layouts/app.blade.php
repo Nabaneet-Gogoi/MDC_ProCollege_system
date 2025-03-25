@@ -170,8 +170,8 @@
                             <i class="bi bi-person-circle"></i> {{ Auth::user()->name ?? 'College User' }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Profile</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Settings</a></li>
+                            <li><a class="dropdown-item" href="{{ route('college.profile.index') }}"><i class="bi bi-person"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="{{ route('college.profile.change-password') }}"><i class="bi bi-key"></i> Change Password</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST">
@@ -212,7 +212,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('college.profile.*') ? 'active' : '' }}" href="#">
+                            <a class="nav-link {{ request()->routeIs('college.profile.*') ? 'active' : '' }}" href="{{ route('college.profile.index') }}">
                                 <i class="bi bi-building"></i> College Profile
                             </a>
                         </li>

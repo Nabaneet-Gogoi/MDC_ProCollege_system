@@ -46,6 +46,8 @@
                         <div>
                             <h6 class="text-uppercase mb-1 opacity-75">Total Funding</h6>
                             <div class="h2 mb-0">₹{{ $totalFunding ?? '0.00' }} Cr</div>
+                            <div class="small mt-2">Released: ₹{{ $releasedFunding ?? '0.00' }} Cr ({{ $fundingReleasePercent ?? 0 }}%)</div>
+                            <div class="small">Utilized: ₹{{ $utilizedFunding ?? '0.00' }} Cr ({{ $fundingUtilizationPercent ?? 0 }}%)</div>
                         </div>
                         <div class="fs-1 opacity-50">
                             <i class="bi bi-cash-coin"></i>
@@ -191,9 +193,21 @@
                                 {{ $fundingUtilizationPercent ?? 0 }}%
                             </div>
                         </div>
-                        <div class="d-flex justify-content-between">
+                        <!-- Add Released Amount Progress Bar -->
+                        <h5 class="card-title mt-3">Fund Release Progress</h5>
+                        <div class="progress mb-3" style="height: 25px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ $fundingReleasePercent ?? 0 }}%;" 
+                                 aria-valuenow="{{ $fundingReleasePercent ?? 0 }}" aria-valuemin="0" aria-valuemax="100">
+                                {{ $fundingReleasePercent ?? 0 }}%
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
                             <small>Total Approved: ₹{{ $totalFunding ?? '0.00' }} Cr</small>
-                            <small>Used: ₹{{ $utilizedFunding ?? '0.00' }} Cr</small>
+                            <small>Released: ₹{{ $releasedFunding ?? '0.00' }} Cr</small>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <small>Total Released: ₹{{ $releasedFunding ?? '0.00' }} Cr</small>
+                            <small>Utilized: ₹{{ $utilizedFunding ?? '0.00' }} Cr</small>
                         </div>
                     </div>
                 </div>
