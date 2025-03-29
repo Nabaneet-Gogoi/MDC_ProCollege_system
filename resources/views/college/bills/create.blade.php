@@ -159,6 +159,13 @@
             @endforeach
         };
 
+        // Initialize previous progress info for any pre-selected categories
+        document.querySelectorAll('.category-select').forEach((select, index) => {
+            if (select.value) {
+                updateProgressInfo(select, index);
+            }
+        });
+
         // Bill amount validation against available released funds
         const fundingSelect = document.getElementById('funding_id');
         const billAmountInput = document.getElementById('bill_amt');
@@ -200,8 +207,19 @@
         function updateProgressInfo(selectElement, index) {
             const categoryId = selectElement.value;
             const infoElement = document.getElementById(`previous_progress_info_${index}`);
+            
+            if (!infoElement) {
+                console.error(`Cannot find info element for index ${index}`);
+                return;
+            }
+            
             const completionInput = document.getElementById(`completion_percent_${index}`);
             const statusSelect = document.getElementById(`progress_status_${index}`);
+            
+            if (!completionInput || !statusSelect) {
+                console.error(`Cannot find input elements for index ${index}`);
+                return;
+            }
             
             // Clear previous info
             infoElement.innerHTML = '';
@@ -251,6 +269,13 @@
         document.querySelectorAll('.category-select').forEach((select, index) => {
             select.addEventListener('change', function() {
                 updateProgressInfo(this, index);
+            });
+            
+            // Also update on dropdown open and click/focus to make info more accessible
+            select.addEventListener('focus', function() {
+                if (this.value) {
+                    updateProgressInfo(this, index);
+                }
             });
         });
         
@@ -322,12 +347,63 @@
             
             container.appendChild(progressItem);
             
-            // Add event listener for category change on new item
-            const newCategorySelect = document.getElementById(`category_id_${progressCounter}`);
+            // Get the newly added elements directly after appending to DOM
+            const newRow = progressItem.querySelector('.row');
+            const newCategorySelect = newRow.querySelector('.category-select');
+            const newInfoElement = newRow.querySelector('.previous-progress-info');
+            const newCompletionInput = newRow.querySelector('input[type="number"]');
+            const newStatusSelect = newRow.querySelector('select:not(.category-select)');
+            
+            // Store the current counter index to use in event handlers
+            const currentIndex = progressCounter;
+            
+            // Add event listeners for the new elements
             newCategorySelect.addEventListener('change', function() {
-                updateProgressInfo(this, progressCounter);
+                // When category changes, display previous progress info
+                const categoryId = this.value;
+                
+                // Clear previous info
+                newInfoElement.innerHTML = '';
+                
+                if (categoryId && previousProgressData[categoryId]) {
+                    const prevData = previousProgressData[categoryId];
+                    let statusText = '';
+                    
+                    switch(prevData.progress_status) {
+                        case 'not_started': statusText = 'Not Started'; break;
+                        case 'in_progress': statusText = 'In Progress'; break;
+                        case 'completed': statusText = 'Completed'; break;
+                        default: statusText = prevData.progress_status;
+                    }
+                    
+                    // Display previous progress info
+                    newInfoElement.innerHTML = `
+                        <div class="alert alert-info py-1 px-2 mt-2 mb-0 small">
+                            <i class="bi bi-info-circle"></i> Previous progress: <strong>${prevData.completion_percent}%</strong> 
+                            (${statusText}) from ${prevData.source}
+                        </div>
+                    `;
+                    
+                    // Auto-populate with at least the previous percentage
+                    if (!newCompletionInput.getAttribute('data-user-changed')) {
+                        newCompletionInput.value = prevData.completion_percent;
+                        
+                        // Set status based on previous status
+                        if (prevData.progress_status === 'completed') {
+                            newStatusSelect.value = 'completed';
+                        } else if (prevData.progress_status === 'in_progress') {
+                            newStatusSelect.value = 'in_progress';
+                        }
+                    }
+                }
             });
             
+            // Mark when user modifies completion percentage
+            newCompletionInput.addEventListener('input', function() {
+                this.setAttribute('data-user-changed', 'true');
+            });
+            
+            // Increment counter for next item
             progressCounter++;
             
             // Add event listeners for remove buttons

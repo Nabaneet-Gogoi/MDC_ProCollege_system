@@ -109,6 +109,19 @@ Route::middleware(['web', 'admin.auth'])->prefix('admin')->group(function () {
     ]);
     Route::patch('bills/{id}/status', 'App\Http\Controllers\Admin\BillController@updateStatus')->name('admin.bills.updateStatus');
     Route::get('bills-filter', 'App\Http\Controllers\Admin\BillController@filter')->name('admin.bills.filter');
+    
+    // Payments Management
+    Route::resource('payments', 'App\Http\Controllers\Admin\PaymentController')->names([
+        'index' => 'admin.payments.index',
+        'create' => 'admin.payments.create',
+        'store' => 'admin.payments.store',
+        'show' => 'admin.payments.show',
+        'edit' => 'admin.payments.edit',
+        'update' => 'admin.payments.update',
+        'destroy' => 'admin.payments.destroy',
+    ]);
+    Route::patch('payments/{id}/status', 'App\Http\Controllers\Admin\PaymentController@updateStatus')->name('admin.payments.updateStatus');
+    Route::get('payments-filter', 'App\Http\Controllers\Admin\PaymentController@filter')->name('admin.payments.filter');
 });
 
 // College User Routes
@@ -124,4 +137,10 @@ Route::middleware(['auth', 'role:college'])->prefix('college')->name('college.')
     
     // Bills Routes
     Route::resource('bills', 'App\Http\Controllers\College\BillController');
+    
+    // Payments tracking
+    Route::resource('payments', 'App\Http\Controllers\College\PaymentController')->only([
+        'index', 'show', 'create', 'store'
+    ]);
+    Route::get('payments-filter', 'App\Http\Controllers\College\PaymentController@filter')->name('payments.filter');
 });

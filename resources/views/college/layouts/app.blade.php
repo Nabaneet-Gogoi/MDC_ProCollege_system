@@ -207,6 +207,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('college.payments.*') ? 'active' : '' }}" href="{{ route('college.payments.index') }}">
+                                <i class="bi bi-credit-card"></i> Payments
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('college.fundings.*') ? 'active' : '' }}" href="#">
                                 <i class="bi bi-cash-coin"></i> Fundings
                             </a>
