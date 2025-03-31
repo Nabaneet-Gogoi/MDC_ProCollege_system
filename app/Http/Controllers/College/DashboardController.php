@@ -28,9 +28,25 @@ class DashboardController extends Controller
             ->where('bill_status', 'pending')
             ->count();
         
+        // Get bills that need payment records
+        // These are approved bills where the total payments don't match the bill amount
+        $billsNeedingPaymentRecords = Bill::where('college_id', $collegeId)
+            ->where('bill_status', 'approved')
+            ->whereRaw('(SELECT COALESCE(SUM(payment_amt), 0) FROM payments WHERE payments.bill_id = bills.bill_id) < bill_amt')
+            ->count();
+        
         // Get recent bills
         $recentBills = Bill::where('college_id', $collegeId)
             ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+            
+        // Get recent payments
+        $recentPayments = DB::table('payments')
+            ->join('bills', 'payments.bill_id', '=', 'bills.bill_id')
+            ->where('bills.college_id', $collegeId)
+            ->select('payments.*', 'bills.bill_no')
+            ->orderBy('payments.created_at', 'desc')
             ->limit(5)
             ->get();
         
@@ -66,7 +82,9 @@ class DashboardController extends Controller
         return view('college.dashboard', compact(
             'totalBills',
             'pendingBills',
+            'billsNeedingPaymentRecords',
             'recentBills',
+            'recentPayments',
             'totalFunding',
             'releasedFunding',
             'utilizedFunding',

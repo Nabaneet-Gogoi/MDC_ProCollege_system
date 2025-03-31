@@ -19,7 +19,7 @@
 
     <!-- Stats Cards Row -->
     <div class="row mb-4">
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-3 col-md-6">
             <div class="card bg-success text-white mb-4 h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -39,7 +39,7 @@
             </div>
         </div>
         
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-3 col-md-6">
             <div class="card bg-primary text-white mb-4 h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -61,7 +61,7 @@
             </div>
         </div>
         
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-3 col-md-6">
             <div class="card bg-warning text-white mb-4 h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -76,6 +76,26 @@
                 </div>
                 <div class="card-footer d-flex align-items-center justify-content-between bg-warning bg-opacity-75">
                     <a class="small text-white stretched-link" href="#">View Details</a>
+                    <div class="small text-white"><i class="bi bi-arrow-right"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-info text-white mb-4 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1 opacity-75">Pending Payments</h6>
+                            <div class="h2 mb-0">{{ $billsNeedingPaymentRecords ?? 0 }}</div>
+                        </div>
+                        <div class="fs-1 opacity-50">
+                            <i class="bi bi-credit-card"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between bg-info bg-opacity-75">
+                    <a class="small text-white stretched-link" href="{{ route('college.payments.create') }}">Record Payment</a>
                     <div class="small text-white"><i class="bi bi-arrow-right"></i></div>
                 </div>
             </div>
@@ -168,6 +188,10 @@
                             <i class="bi bi-receipt me-2 text-info"></i>
                             Manage Bills
                         </a>
+                        <a href="{{ route('college.bills.status.manage') }}" class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="bi bi-pencil-square me-2 text-danger"></i>
+                            Manage Bill Status
+                        </a>
                         <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">
                             <i class="bi bi-cash-coin me-2 text-primary"></i>
                             View Fundings
@@ -210,6 +234,78 @@
                             <small>Utilized: ₹{{ $utilizedFunding ?? '0.00' }} Cr</small>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Payments Row -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-credit-card me-1"></i>
+                        Recent Payments
+                    </div>
+                    <a href="{{ route('college.payments.create') }}" class="btn btn-sm btn-info">
+                        <i class="bi bi-plus-circle"></i> Record New Payment
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if(isset($recentPayments) && count($recentPayments) > 0)
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Payment ID</th>
+                                        <th>Bill Number</th>
+                                        <th>Amount (₹ Cr)</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Transaction Ref</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($recentPayments as $payment)
+                                        <tr>
+                                            <td>{{ $payment->payment_id }}</td>
+                                            <td>{{ $payment->bill_no }}</td>
+                                            <td>{{ number_format($payment->payment_amt, 2) }}</td>
+                                            <td>{{ date('d M Y', strtotime($payment->payment_date)) }}</td>
+                                            <td>
+                                                @if($payment->payment_status == 'pending')
+                                                    <span class="badge bg-warning">Pending</span>
+                                                @elseif($payment->payment_status == 'completed')
+                                                    <span class="badge bg-success">Completed</span>
+                                                @else
+                                                    <span class="badge bg-secondary">{{ ucfirst($payment->payment_status) }}</span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $payment->transaction_reference ?? 'N/A' }}</td>
+                                            <td>
+                                                <a href="{{ route('college.payments.show', $payment->payment_id) }}" class="btn btn-sm btn-primary">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="text-center py-4">
+                            <i class="bi bi-credit-card display-4 text-muted"></i>
+                            <p class="lead mt-3">No payment records found</p>
+                            <a href="{{ route('college.payments.create') }}" class="btn btn-info">
+                                <i class="bi bi-plus-circle"></i> Record Your First Payment
+                            </a>
+                        </div>
+                    @endif
+                </div>
+                <div class="card-footer bg-white border-top-0">
+                    <a href="{{ route('college.payments.index') }}" class="btn btn-outline-secondary btn-sm">View All Payments</a>
                 </div>
             </div>
         </div>

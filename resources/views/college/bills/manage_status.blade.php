@@ -1,16 +1,13 @@
 @extends('college.layouts.app')
 
-@section('title', 'Manage Bills')
+@section('title', 'Manage Bill Status')
 
 @section('content')
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Manage Bills</h1>
+        <h1 class="h2">Manage Bill Status</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="{{ route('college.bills.status.manage') }}" class="btn btn-sm btn-secondary me-2">
-                <i class="bi bi-gear"></i> Manage Bill Status
-            </a>
-            <a href="{{ route('college.bills.create') }}" class="btn btn-sm btn-primary">
-                <i class="bi bi-plus-circle"></i> Submit New Bill
+            <a href="{{ route('college.bills.index') }}" class="btn btn-sm btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Bills
             </a>
         </div>
     </div>
@@ -32,7 +29,7 @@
     <div class="card">
         <div class="card-header">
             <i class="bi bi-file-earmark-text me-1"></i>
-            Bills List
+            Bills Status Management
         </div>
         <div class="card-body">
             @if($bills->count() > 0)
@@ -43,7 +40,7 @@
                                 <th>Bill Number</th>
                                 <th>Amount (₹ Cr)</th>
                                 <th>Date</th>
-                                <th>Status</th>
+                                <th>Current Status</th>
                                 <th>Project</th>
                                 <th>Physical Progress</th>
                                 <th>Actions</th>
@@ -77,25 +74,45 @@
                                         <small>{{ number_format($avgProgress, 0) }}% Complete</small>
                                     </td>
                                     <td>
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <a href="{{ route('college.bills.show', $bill->bill_id) }}" class="btn btn-info" title="View details">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            
-                                            @if($bill->bill_status === 'pending')
-                                                <a href="{{ route('college.bills.edit', $bill->bill_id) }}" class="btn btn-primary" title="Edit">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                                
-                                                <form action="{{ route('college.bills.destroy', $bill->bill_id) }}" method="POST" 
-                                                    class="d-inline" onsubmit="return confirm('Are you sure you want to delete this bill?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger" title="Delete">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
-                                            @endif
+                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#statusModal{{ $bill->bill_id }}">
+                                            <i class="bi bi-pencil-square"></i> Update Status
+                                        </button>
+                                        
+                                        <!-- Status Update Modal -->
+                                        <div class="modal fade" id="statusModal{{ $bill->bill_id }}" tabindex="-1" aria-labelledby="statusModalLabel{{ $bill->bill_id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="statusModalLabel{{ $bill->bill_id }}">Update Status: {{ $bill->bill_no }}</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <form action="{{ route('college.bills.status.update', $bill->bill_id) }}" method="POST">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <div class="modal-body">
+                                                            <div class="mb-3">
+                                                                <label for="status{{ $bill->bill_id }}" class="form-label">Status</label>
+                                                                <select class="form-select" id="status{{ $bill->bill_id }}" name="status" required>
+                                                                    @foreach(App\Models\Bill::getStatusOptions() as $value => $label)
+                                                                        <option value="{{ $value }}" {{ $bill->bill_status == $value ? 'selected' : '' }}>
+                                                                            {{ $label }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label for="remarks{{ $bill->bill_id }}" class="form-label">Remarks</label>
+                                                                <textarea class="form-control" id="remarks{{ $bill->bill_id }}" name="remarks" rows="3">{{ $bill->college_remarks }}</textarea>
+                                                                <small class="text-muted">Add any comments or details about this status change.</small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-primary">Update Status</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>

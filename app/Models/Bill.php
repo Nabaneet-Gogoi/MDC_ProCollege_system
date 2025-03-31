@@ -38,6 +38,7 @@ class Bill extends Model
         'bill_status',
         'description',
         'admin_remarks',
+        'college_remarks',
     ];
     
     /**

@@ -202,8 +202,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('college.bills.*') ? 'active' : '' }}" href="{{ route('college.bills.index') }}">
+                            <a class="nav-link {{ request()->routeIs('college.bills.*') && !request()->routeIs('college.bills.status.*') ? 'active' : '' }}" href="{{ route('college.bills.index') }}">
                                 <i class="bi bi-receipt"></i> Bills
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('college.bills.status.*') ? 'active' : '' }}" href="{{ route('college.bills.status.manage') }}" style="padding-left: 40px;">
+                                <i class="bi bi-arrow-right"></i> Bill Status
                             </a>
                         </li>
                         <li class="nav-item">

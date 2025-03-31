@@ -138,6 +138,10 @@ Route::middleware(['auth', 'role:college'])->prefix('college')->name('college.')
     // Bills Routes
     Route::resource('bills', 'App\Http\Controllers\College\BillController');
     
+    // Bill Status Management Routes
+    Route::get('bills-status', 'App\Http\Controllers\College\BillController@manageStatus')->name('bills.status.manage');
+    Route::patch('bills-status/{id}', 'App\Http\Controllers\College\BillController@updateStatus')->name('bills.status.update');
+    
     // Payments tracking
     Route::resource('payments', 'App\Http\Controllers\College\PaymentController')->only([
         'index', 'show', 'create', 'store'

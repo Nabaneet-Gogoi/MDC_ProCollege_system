@@ -480,4 +480,45 @@ class BillController extends Controller
             return back()->with('error', 'An error occurred while deleting the bill: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Display bills for status management.
+     */
+    public function manageStatus()
+    {
+        $collegeId = Auth::user()->college_id;
+        
+        $bills = Bill::where('college_id', $collegeId)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+            
+        return view('college.bills.manage_status', compact('bills'));
+    }
+
+    /**
+     * Update the bill status.
+     */
+    public function updateStatus(Request $request, string $id)
+    {
+        // Validate status
+        $request->validate([
+            'status' => 'required|in:pending,approved,rejected,paid',
+            'remarks' => 'nullable|string|max:500',
+        ]);
+        
+        $collegeId = Auth::user()->college_id;
+        
+        $bill = Bill::where('bill_id', $id)
+            ->where('college_id', $collegeId)
+            ->firstOrFail();
+        
+        // Update bill status
+        $bill->update([
+            'bill_status' => $request->status,
+            'college_remarks' => $request->remarks,
+        ]);
+        
+        return redirect()->route('college.bills.status.manage')
+            ->with('success', "Bill status updated to '{$request->status}' successfully.");
+    }
 }

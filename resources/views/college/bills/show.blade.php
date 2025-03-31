@@ -89,6 +89,20 @@
                             <div class="col-md-8">{{ $bill->description }}</div>
                         </div>
                     @endif
+                    
+                    @if($bill->admin_remarks)
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Admin Remarks:</div>
+                            <div class="col-md-8">{{ $bill->admin_remarks }}</div>
+                        </div>
+                    @endif
+                    
+                    @if($bill->college_remarks)
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">College Remarks:</div>
+                            <div class="col-md-8">{{ $bill->college_remarks }}</div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
