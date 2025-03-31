@@ -83,8 +83,15 @@
                     
                     @if($payment->remarks)
                         <div class="mt-3">
-                            <h6 class="fw-bold">Remarks:</h6>
+                            <h6 class="fw-bold">College Remarks:</h6>
                             <p>{{ $payment->remarks }}</p>
+                        </div>
+                    @endif
+                    
+                    @if($payment->admin_remarks)
+                        <div class="mt-3">
+                            <h6 class="fw-bold">Admin Remarks:</h6>
+                            <p>{{ $payment->admin_remarks }}</p>
                         </div>
                     @endif
                     
@@ -93,47 +100,23 @@
                         <h6 class="fw-bold mb-3">Update Payment Status:</h6>
                         <div class="d-flex flex-wrap gap-2">
                             @if($payment->payment_status === 'pending')
-                                <form action="{{ route('admin.payments.updateStatus', $payment->payment_id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input type="hidden" name="status" value="processed">
-                                    <button type="submit" class="btn btn-info" 
-                                        onclick="return confirm('Are you sure you want to mark this payment as processed?');">
-                                        <i class="bi bi-hourglass-split me-1"></i> Mark as Processed
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#processPaymentModal">
+                                    <i class="bi bi-hourglass-split me-1"></i> Mark as Processed
+                                </button>
                                 
-                                <form action="{{ route('admin.payments.updateStatus', $payment->payment_id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input type="hidden" name="status" value="rejected">
-                                    <button type="submit" class="btn btn-danger" 
-                                        onclick="return confirm('Are you sure you want to reject this payment?');">
-                                        <i class="bi bi-x-circle me-1"></i> Reject Payment
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectPaymentModal">
+                                    <i class="bi bi-x-circle me-1"></i> Reject Payment
+                                </button>
                             @endif
                             
                             @if($payment->payment_status === 'processed')
-                                <form action="{{ route('admin.payments.updateStatus', $payment->payment_id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input type="hidden" name="status" value="completed">
-                                    <button type="submit" class="btn btn-success" 
-                                        onclick="return confirm('Are you sure you want to mark this payment as completed?');">
-                                        <i class="bi bi-check-circle me-1"></i> Mark as Completed
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#completePaymentModal">
+                                    <i class="bi bi-check-circle me-1"></i> Mark as Completed
+                                </button>
                                 
-                                <form action="{{ route('admin.payments.updateStatus', $payment->payment_id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input type="hidden" name="status" value="rejected">
-                                    <button type="submit" class="btn btn-danger" 
-                                        onclick="return confirm('Are you sure you want to reject this payment?');">
-                                        <i class="bi bi-x-circle me-1"></i> Reject Payment
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectPaymentModal">
+                                    <i class="bi bi-x-circle me-1"></i> Reject Payment
+                                </button>
                             @endif
                             
                             @if($payment->payment_status === 'pending')
@@ -270,4 +253,91 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('modals')
+<!-- Process Payment Modal -->
+<div class="modal fade" id="processPaymentModal" tabindex="-1" aria-labelledby="processPaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ route('admin.payments.updateStatus', $payment->payment_id) }}" method="POST">
+                @csrf
+                @method('PATCH')
+                <input type="hidden" name="status" value="processed">
+                
+                <div class="modal-header">
+                    <h5 class="modal-title" id="processPaymentModalLabel">Mark Payment as Processed</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="admin_remarks" class="form-label">Admin Remarks</label>
+                        <textarea class="form-control" id="admin_remarks" name="admin_remarks" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-info">Mark as Processed</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Complete Payment Modal -->
+<div class="modal fade" id="completePaymentModal" tabindex="-1" aria-labelledby="completePaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ route('admin.payments.updateStatus', $payment->payment_id) }}" method="POST">
+                @csrf
+                @method('PATCH')
+                <input type="hidden" name="status" value="completed">
+                
+                <div class="modal-header">
+                    <h5 class="modal-title" id="completePaymentModalLabel">Mark Payment as Completed</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="admin_remarks" class="form-label">Admin Remarks</label>
+                        <textarea class="form-control" id="admin_remarks" name="admin_remarks" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Mark as Completed</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Payment Modal -->
+<div class="modal fade" id="rejectPaymentModal" tabindex="-1" aria-labelledby="rejectPaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ route('admin.payments.updateStatus', $payment->payment_id) }}" method="POST">
+                @csrf
+                @method('PATCH')
+                <input type="hidden" name="status" value="rejected">
+                
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rejectPaymentModalLabel">Reject Payment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="admin_remarks" class="form-label">Admin Remarks <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="admin_remarks" name="admin_remarks" rows="3" required></textarea>
+                        <div class="form-text">Please provide a reason for rejecting this payment.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Reject Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection 

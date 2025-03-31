@@ -82,13 +82,14 @@
                 </div>
                 
                 <div class="row mb-3">
-                    <label for="remarks" class="col-md-3 col-form-label">Remarks</label>
+                    <label for="remarks" class="col-md-3 col-form-label">College Remarks</label>
                     <div class="col-md-9">
                         <textarea class="form-control @error('remarks') is-invalid @enderror" 
                             id="remarks" name="remarks" rows="3">{{ old('remarks') }}</textarea>
                         @error('remarks')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                        <small class="form-text text-muted">Add your notes or comments regarding this payment</small>
                     </div>
                 </div>
                 

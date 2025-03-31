@@ -35,6 +35,7 @@ class Payment extends Model
         'payment_status',
         'transaction_reference',
         'remarks',
+        'admin_remarks',
     ];
     
     /**

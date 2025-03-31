@@ -164,4 +164,60 @@ class PaymentController extends Controller
         
         return view('college.payments.index', compact('payments', 'bills'));
     }
+    
+    /**
+     * Display payments for status management.
+     */
+    public function manageStatus()
+    {
+        $collegeId = Auth::user()->college_id;
+        
+        $payments = Payment::whereHas('bill', function($query) use ($collegeId) {
+            $query->where('college_id', $collegeId);
+        })
+        ->with('bill')
+        ->orderBy('created_at', 'desc')
+        ->paginate(10);
+        
+        return view('college.payments.manage_status', compact('payments'));
+    }
+
+    /**
+     * Update the payment status.
+     */
+    public function updateStatus(Request $request, string $id)
+    {
+        // Validate status
+        $request->validate([
+            'status' => 'required|in:pending,completed,rejected',
+            'remarks' => 'nullable|string|max:500',
+        ]);
+        
+        $collegeId = Auth::user()->college_id;
+        
+        $payment = Payment::whereHas('bill', function($query) use ($collegeId) {
+            $query->where('college_id', $collegeId);
+        })->findOrFail($id);
+        
+        // Update payment status
+        $payment->update([
+            'payment_status' => $request->status,
+            'remarks' => $request->remarks,
+        ]);
+        
+        // If payment is completed, check if bill should be marked as paid
+        if ($request->status === 'completed') {
+            $bill = Bill::find($payment->bill_id);
+            $totalPaid = Payment::where('bill_id', $bill->bill_id)
+                ->where('payment_status', 'completed')
+                ->sum('payment_amt');
+                
+            if ($totalPaid >= $bill->bill_amt) {
+                $bill->update(['bill_status' => 'paid']);
+            }
+        }
+        
+        return redirect()->route('college.payments.status.manage')
+            ->with('success', "Payment status updated to '{$request->status}' successfully.");
+    }
 } 

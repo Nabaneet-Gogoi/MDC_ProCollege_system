@@ -129,6 +129,9 @@ Route::middleware(['auth', 'role:college'])->prefix('college')->name('college.')
     // Dashboard Route
     Route::get('dashboard', 'App\Http\Controllers\College\DashboardController@index')->name('dashboard');
     
+    // Fund Utilization Route
+    Route::get('utilization', 'App\Http\Controllers\College\DashboardController@fundUtilization')->name('utilization');
+    
     // Profile Routes
     Route::get('profile', 'App\Http\Controllers\College\ProfileController@index')->name('profile.index');
     Route::put('profile/update', 'App\Http\Controllers\College\ProfileController@update')->name('profile.update');
@@ -147,4 +150,8 @@ Route::middleware(['auth', 'role:college'])->prefix('college')->name('college.')
         'index', 'show', 'create', 'store'
     ]);
     Route::get('payments-filter', 'App\Http\Controllers\College\PaymentController@filter')->name('payments.filter');
+    
+    // Payment Status Management Routes
+    Route::get('payments-status', 'App\Http\Controllers\College\PaymentController@manageStatus')->name('payments.status.manage');
+    Route::patch('payments-status/{id}', 'App\Http\Controllers\College\PaymentController@updateStatus')->name('payments.status.update');
 });

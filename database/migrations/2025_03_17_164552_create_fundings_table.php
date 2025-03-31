@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('fundings', function (Blueprint $table) {
             $table->id('funding_id');
             $table->foreignId('college_id')->constrained('colleges', 'college_id');
+            $table->string('funding_name')->comment('Name of the funding');
             $table->decimal('approved_amt', 10, 2)->comment('Total approved amount in crores');
             $table->decimal('central_share', 10, 2)->comment('Central government share amount');
             $table->decimal('state_share', 10, 2)->comment('State government share amount');

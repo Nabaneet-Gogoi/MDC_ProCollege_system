@@ -20,7 +20,7 @@
                     Bill Details
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('college.bills.update', $bill->bill_id) }}" method="POST">
+                    <form action="{{ route('college.bills.update', $bill->bill_id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         
@@ -43,6 +43,8 @@
                             <div class="col-md-4">
                                 <label class="form-label">Project Funding</label>
                                 <input type="text" class="form-control" value="{{ $bill->funding->college->college_name }} - ₹{{ $bill->funding->approved_amt }} Cr" readonly>
+                                <input type="hidden" name="funding_id" value="{{ $bill->funding_id }}">
+                                <input type="hidden" name="bill_amt" value="{{ $bill->bill_amt }}">
                             </div>
                         </div>
                         
@@ -64,6 +66,28 @@
                             @error('description')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="bill_image" class="form-label">Bill Image</label>
+                            @if($bill->bill_image)
+                                <div class="mb-2">
+                                    <label>Current Image:</label>
+                                    <div>
+                                        <a href="{{ asset('storage/' . $bill->bill_image) }}" target="_blank">
+                                            <img src="{{ asset('storage/' . $bill->bill_image) }}" alt="Bill Image" class="img-thumbnail" style="max-height: 100px;">
+                                        </a>
+                                    </div>
+                                </div>
+                            @endif
+                            <input type="file" class="form-control @error('bill_image') is-invalid @enderror" 
+                                id="bill_image" name="bill_image" accept="image/*">
+                            @error('bill_image')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text">
+                                Upload a new image only if you want to replace the existing one.
+                            </div>
                         </div>
 
                         <hr class="my-4">

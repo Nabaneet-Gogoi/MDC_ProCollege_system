@@ -74,6 +74,18 @@
                             @enderror
                         </div>
 
+                        <div class="mb-3">
+                            <label for="bill_image" class="form-label">Bill Image <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control @error('bill_image') is-invalid @enderror" 
+                                id="bill_image" name="bill_image" accept="image/*" required>
+                            @error('bill_image')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text">
+                                Please upload a clear image of the physical bill (JPG, PNG, or PDF formats accepted).
+                            </div>
+                        </div>
+
                         <hr class="my-4">
                         
                         <h5 class="mb-3">Physical Progress Details</h5>

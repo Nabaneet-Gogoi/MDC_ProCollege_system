@@ -78,8 +78,15 @@
                     
                     @if($payment->remarks)
                         <div class="mt-3">
-                            <h6 class="fw-bold">Remarks:</h6>
+                            <h6 class="fw-bold">College Remarks:</h6>
                             <p>{{ $payment->remarks }}</p>
+                        </div>
+                    @endif
+                    
+                    @if($payment->admin_remarks)
+                        <div class="mt-3">
+                            <h6 class="fw-bold">Admin Remarks:</h6>
+                            <p>{{ $payment->admin_remarks }}</p>
                         </div>
                     @endif
                 </div>

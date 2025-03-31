@@ -55,7 +55,7 @@ class PaymentController extends Controller
             'payment_date' => 'required|date',
             'payment_status' => 'required|in:pending,completed',
             'transaction_reference' => 'nullable|string|max:255',
-            'remarks' => 'nullable|string|max:500',
+            'admin_remarks' => 'nullable|string|max:500',
         ]);
         
         // Get the bill to ensure payment amount doesn't exceed bill amount
@@ -80,7 +80,7 @@ class PaymentController extends Controller
                 'payment_date' => $request->payment_date,
                 'payment_status' => $request->payment_status,
                 'transaction_reference' => $request->transaction_reference,
-                'remarks' => $request->remarks,
+                'admin_remarks' => $request->admin_remarks,
             ]);
             
             // Update bill status to paid if full amount is paid
@@ -140,7 +140,7 @@ class PaymentController extends Controller
         $request->validate([
             'payment_status' => 'required|in:pending,completed',
             'transaction_reference' => 'nullable|string|max:255',
-            'remarks' => 'nullable|string|max:500',
+            'admin_remarks' => 'nullable|string|max:500',
         ]);
         
         $payment = Payment::findOrFail($id);
@@ -155,7 +155,7 @@ class PaymentController extends Controller
         $payment->update([
             'payment_status' => $request->payment_status,
             'transaction_reference' => $request->transaction_reference,
-            'remarks' => $request->remarks,
+            'admin_remarks' => $request->admin_remarks,
         ]);
         
         // If payment is completed, check if bill should be marked as paid
@@ -201,7 +201,7 @@ class PaymentController extends Controller
         // Validate status
         $request->validate([
             'status' => 'required|in:pending,completed',
-            'remarks' => 'nullable|string|max:500',
+            'admin_remarks' => 'nullable|string|max:500',
         ]);
         
         $payment = Payment::findOrFail($id);
@@ -209,7 +209,7 @@ class PaymentController extends Controller
         // Update payment status
         $payment->update([
             'payment_status' => $request->status,
-            'remarks' => $request->remarks,
+            'admin_remarks' => $request->admin_remarks,
         ]);
         
         // If payment is completed, check if bill should be marked as paid

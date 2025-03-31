@@ -105,6 +105,7 @@ class BillController extends Controller
             'bill_amt' => 'required|numeric|min:0.01',
             'bill_date' => 'required|date',
             'description' => 'nullable|string|max:500',
+            'bill_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'progress' => 'required|array|min:1',
             'progress.*.category_id' => 'required|exists:work_categories,category_id',
             'progress.*.completion_percent' => 'required|numeric|min:0|max:100',
@@ -188,6 +189,12 @@ class BillController extends Controller
             // Generate bill number
             $billNumber = Bill::generateBillNumber($request->college_id);
             
+            // Handle bill image upload
+            $billImagePath = null;
+            if ($request->hasFile('bill_image')) {
+                $billImagePath = $request->file('bill_image')->store('bills/' . $request->college_id, 'public');
+            }
+            
             // Create the bill
             $bill = Bill::create([
                 'college_id' => $request->college_id,
@@ -198,6 +205,7 @@ class BillController extends Controller
                 'bill_date' => $request->bill_date,
                 'bill_status' => 'pending',
                 'description' => $request->description,
+                'bill_image' => $billImagePath,
             ]);
             
             // Create progress records
@@ -316,43 +324,40 @@ class BillController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $collegeId = Auth::user()->college_id;
-        
+        // Get the bill
         $bill = Bill::where('bill_id', $id)
-            ->where('college_id', $collegeId)
+            ->where('college_id', Auth::user()->college_id)
             ->firstOrFail();
             
-        // Only pending bills can be updated
+        // Check if bill is editable
         if ($bill->bill_status !== 'pending') {
-            return redirect()->route('college.bills.show', $bill->bill_id)
-                ->with('error', 'Only pending bills can be updated.');
+            return back()->with('error', 'Only pending bills can be edited');
         }
         
         // Validate bill data
         $request->validate([
+            'funding_id' => 'required|exists:fundings,funding_id',
+            'bill_amt' => 'required|numeric|min:0.01',
             'bill_date' => 'required|date',
             'description' => 'nullable|string|max:500',
+            'bill_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'college_remarks' => 'nullable|string|max:500',
             'progress' => 'required|array|min:1',
-            'progress.*.progress_id' => 'nullable|exists:bill_progress,progress_id',
             'progress.*.category_id' => 'required|exists:work_categories,category_id',
             'progress.*.completion_percent' => 'required|numeric|min:0|max:100',
             'progress.*.progress_status' => 'required|in:not_started,in_progress,completed',
             'progress.*.description' => 'nullable|string|max:500',
         ]);
         
-        // Validate that completion percentages don't decrease from previous approved values
+        $collegeId = $bill->college_id;
+        
+        // Validate that completion percentages don't decrease
         $validationErrors = [];
         foreach ($request->progress as $index => $progressData) {
             $categoryId = $progressData['category_id'];
             $newCompletionPercent = (float)$progressData['completion_percent'];
-            $progressId = $progressData['progress_id'] ?? null;
             
-            // Skip validation for the current progress items
-            if ($progressId) {
-                continue;
-            }
-            
-            // Find the latest progress for this category (excluding current bill)
+            // Find the latest approved progress for this category (excluding this bill)
             $latestProgress = BillProgress::whereHas('bill', function($query) use ($collegeId, $id) {
                     $query->where('college_id', $collegeId)
                           ->where('bill_id', '!=', $id)
@@ -384,58 +389,87 @@ class BillController extends Controller
             return back()->withInput()->withErrors($validationErrors);
         }
         
+        // Get the funding
+        $funding = Funding::findOrFail($request->funding_id);
+        
+        // Check total released amount
+        $totalReleased = $funding->total_released;
+        
+        // Get total utilized amount for this funding (excluding this bill)
+        $totalUtilized = Bill::where('funding_id', $request->funding_id)
+            ->where('bill_id', '!=', $id)
+            ->where('bill_status', '!=', 'rejected')
+            ->sum('bill_amt');
+        
+        // Calculate available amount for billing
+        $availableAmount = $totalReleased - $totalUtilized;
+        
+        // Check if bill amount exceeds available released funds
+        if ($request->bill_amt > $availableAmount) {
+            return back()->withInput()->withErrors([
+                'bill_amt' => "Bill amount (₹{$request->bill_amt} Cr) cannot exceed the available released funds (₹{$availableAmount} Cr)"
+            ]);
+        }
+        
         // Begin transaction
         DB::beginTransaction();
         
         try {
-            // Update bill
-            $bill->update([
-                'bill_date' => $request->bill_date,
-                'description' => $request->description,
-            ]);
-            
-            // Track existing progress IDs to determine which to delete
-            $existingProgressIds = $bill->progress->pluck('progress_id')->toArray();
-            $updatedProgressIds = [];
-            
-            // Update or create progress records
-            foreach ($request->progress as $progressData) {
-                if (!empty($progressData['progress_id'])) {
-                    // Update existing progress
-                    $progress = BillProgress::findOrFail($progressData['progress_id']);
-                    $progress->update([
-                        'category_id' => $progressData['category_id'],
-                        'completion_percent' => $progressData['completion_percent'],
-                        'progress_status' => $progressData['progress_status'],
-                        'description' => $progressData['description'] ?? null,
-                    ]);
-                    
-                    $updatedProgressIds[] = $progress->progress_id;
-                } else {
-                    // Create new progress
-                    $progress = BillProgress::create([
-                        'bill_id' => $bill->bill_id,
-                        'college_id' => $collegeId,
-                        'category_id' => $progressData['category_id'],
-                        'completion_percent' => $progressData['completion_percent'],
-                        'progress_status' => $progressData['progress_status'],
-                        'description' => $progressData['description'] ?? null,
-                    ]);
-                    
-                    $updatedProgressIds[] = $progress->progress_id;
+            // Handle bill image upload if a new image is provided
+            $billImagePath = $bill->bill_image;
+            if ($request->hasFile('bill_image')) {
+                // Delete old image if it exists
+                if ($billImagePath && \Storage::disk('public')->exists($billImagePath)) {
+                    \Storage::disk('public')->delete($billImagePath);
                 }
+                
+                $billImagePath = $request->file('bill_image')->store('bills/' . $collegeId, 'public');
             }
             
-            // Delete progress records that were removed
-            $progressToDelete = array_diff($existingProgressIds, $updatedProgressIds);
-            if (!empty($progressToDelete)) {
-                BillProgress::whereIn('progress_id', $progressToDelete)->delete();
+            // Update the bill
+            $bill->update([
+                'funding_id' => $request->funding_id,
+                'bill_amt' => $request->bill_amt,
+                'bill_date' => $request->bill_date,
+                'description' => $request->description,
+                'college_remarks' => $request->college_remarks,
+                'bill_image' => $billImagePath,
+            ]);
+            
+            // Delete existing progress records
+            BillProgress::where('bill_id', $id)->delete();
+            
+            // Create new progress records
+            foreach ($request->progress as $progressData) {
+                BillProgress::create([
+                    'bill_id' => $id,
+                    'college_id' => $collegeId,
+                    'category_id' => $progressData['category_id'],
+                    'completion_percent' => $progressData['completion_percent'],
+                    'progress_status' => $progressData['progress_status'],
+                    'description' => $progressData['description'] ?? null,
+                ]);
+            }
+            
+            // Update funding utilization status based on total bills
+            $totalBilled = Bill::where('funding_id', $request->funding_id)
+                ->where('bill_status', '!=', 'rejected')
+                ->sum('bill_amt');
+                
+            $utilizationPercentage = ($totalBilled / $funding->approved_amt) * 100;
+            
+            if ($utilizationPercentage >= 100) {
+                $funding->update(['utilization_status' => 'completed']);
+            } elseif ($utilizationPercentage > 0) {
+                $funding->update(['utilization_status' => 'in_progress']);
+            } else {
+                $funding->update(['utilization_status' => 'not_started']);
             }
             
             DB::commit();
             
-            return redirect()->route('college.bills.show', $bill->bill_id)
-                ->with('success', 'Bill updated successfully.');
+            return redirect()->route('college.bills.show', $id)
+                ->with('success', 'Bill updated successfully');
                 
         } catch (\Exception $e) {
             DB::rollBack();

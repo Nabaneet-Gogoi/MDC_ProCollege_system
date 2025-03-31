@@ -9,6 +9,9 @@
             <a href="{{ route('college.payments.create') }}" class="btn btn-sm btn-success me-2">
                 <i class="bi bi-plus-circle"></i> Record New Payment
             </a>
+            <a href="{{ route('college.payments.status.manage') }}" class="btn btn-sm btn-primary me-2">
+                <i class="bi bi-gear"></i> Manage Payment Status
+            </a>
             <a href="{{ route('college.dashboard') }}" class="btn btn-sm btn-secondary">
                 <i class="bi bi-arrow-left"></i> Back to Dashboard
             </a>

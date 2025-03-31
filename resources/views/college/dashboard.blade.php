@@ -310,4 +310,206 @@
             </div>
         </div>
     </div>
+    
+    <!-- Funding Utilization Section -->
+    <div class="row">
+        <!-- Utilization Chart -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-graph-up me-1"></i>
+                    Fund Utilization Trends
+                </div>
+                <div class="card-body">
+                    <canvas id="utilizationChart" height="250"></canvas>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="d-flex justify-content-between">
+                        <span>Total Approved: ₹{{ number_format($totalFunding, 2) }} Cr</span>
+                        <span>Total Utilized: ₹{{ number_format($utilizedFunding, 2) }} Cr</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Utilization Summary -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <i class="bi bi-pie-chart me-1"></i>
+                    Fund Utilization Overview
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="text-center">Released vs. Approved</h5>
+                            <div class="position-relative mx-auto" style="width: 160px; height: 160px;">
+                                <div class="progress-circle" style="--progress: {{ $fundingReleasePercent }}%">
+                                    <div class="progress-text">{{ $fundingReleasePercent }}%</div>
+                                </div>
+                            </div>
+                            <p class="text-center mt-2">₹{{ number_format($releasedFunding, 2) }} / ₹{{ number_format($totalFunding, 2) }} Cr</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-center">Utilized vs. Released</h5>
+                            <div class="position-relative mx-auto" style="width: 160px; height: 160px;">
+                                <div class="progress-circle" style="--progress: {{ $fundingUtilizationPercent }}%">
+                                    <div class="progress-text">{{ $fundingUtilizationPercent }}%</div>
+                                </div>
+                            </div>
+                            <p class="text-center mt-2">₹{{ number_format($utilizedFunding, 2) }} / ₹{{ number_format($releasedFunding, 2) }} Cr</p>
+                        </div>
+                    </div>
+                    <div class="alert alert-primary" role="alert">
+                        <i class="bi bi-info-circle me-1"></i> Your utilization rate updates automatically whenever a bill is approved.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Detailed Funding Breakdown -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-list-columns me-1"></i>
+                    Detailed Funding Breakdown
+                </div>
+                <div class="card-body">
+                    @if(count($fundingBreakdown) > 0)
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Funding Source</th>
+                                        <th>Approved</th>
+                                        <th>Released</th>
+                                        <th>Utilized</th>
+                                        <th>Remaining</th>
+                                        <th>Utilization %</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($fundingBreakdown as $funding)
+                                        <tr>
+                                            <td>{{ $funding['funding_name'] }}</td>
+                                            <td>₹{{ number_format($funding['approved_amt'], 2) }} Cr</td>
+                                            <td>₹{{ number_format($funding['released_amt'], 2) }} Cr</td>
+                                            <td>₹{{ number_format($funding['utilized_amt'], 2) }} Cr</td>
+                                            <td>₹{{ number_format($funding['remaining_amt'], 2) }} Cr</td>
+                                            <td>
+                                                <div class="progress" style="height: 8px;">
+                                                    <div class="progress-bar {{ $funding['utilization_percent'] >= 90 ? 'bg-success' : 'bg-primary' }}" 
+                                                         role="progressbar" style="width: {{ $funding['utilization_percent'] }}%;" 
+                                                         aria-valuenow="{{ $funding['utilization_percent'] }}" aria-valuemin="0" aria-valuemax="100">
+                                                    </div>
+                                                </div>
+                                                <small>{{ $funding['utilization_percent'] }}%</small>
+                                            </td>
+                                            <td>
+                                                @if($funding['utilization_status'] == 'completed')
+                                                    <span class="badge bg-success">Completed</span>
+                                                @elseif($funding['utilization_status'] == 'in_progress')
+                                                    <span class="badge bg-primary">In Progress</span>
+                                                @else
+                                                    <span class="badge bg-secondary">Not Started</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="text-center py-4">
+                            <i class="bi bi-wallet2 display-4 text-muted"></i>
+                            <p class="lead mt-3">No funding data available</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('styles')
+<style>
+    .progress-circle {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: conic-gradient(#28a745 calc(var(--progress) * 1%), #e9ecef 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .progress-circle::before {
+        content: '';
+        position: absolute;
+        width: 80%;
+        height: 80%;
+        border-radius: 50%;
+        background: white;
+    }
+    
+    .progress-text {
+        position: relative;
+        font-size: 22px;
+        font-weight: bold;
+    }
+</style>
+@endsection
+
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Utilization Chart
+        const utilizationCtx = document.getElementById('utilizationChart').getContext('2d');
+        const utilizationChart = new Chart(utilizationCtx, {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($utilizationChartData['labels'] ?? []) !!},
+                datasets: [{
+                    label: 'Monthly Fund Utilization (₹ Cr)',
+                    data: {!! json_encode($utilizationChartData['data'] ?? []) !!},
+                    backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Amount (₹ Cr)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Month'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Fund Utilization Trend (Last 6 Months)'
+                    }
+                }
+            }
+        });
+    });
+</script>
 @endsection 

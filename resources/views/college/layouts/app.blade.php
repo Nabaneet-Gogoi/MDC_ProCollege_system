@@ -202,6 +202,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('college.utilization') ? 'active' : '' }}" href="{{ route('college.utilization') }}">
+                                <i class="bi bi-graph-up"></i> Fund Utilization
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('college.bills.*') && !request()->routeIs('college.bills.status.*') ? 'active' : '' }}" href="{{ route('college.bills.index') }}">
                                 <i class="bi bi-receipt"></i> Bills
                             </a>
@@ -212,13 +217,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('college.payments.*') ? 'active' : '' }}" href="{{ route('college.payments.index') }}">
+                            <a class="nav-link {{ request()->routeIs('college.payments.*') && !request()->routeIs('college.payments.status.*') ? 'active' : '' }}" href="{{ route('college.payments.index') }}">
                                 <i class="bi bi-credit-card"></i> Payments
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('college.fundings.*') ? 'active' : '' }}" href="#">
-                                <i class="bi bi-cash-coin"></i> Fundings
+                            <a class="nav-link {{ request()->routeIs('college.payments.status.*') ? 'active' : '' }}" href="{{ route('college.payments.status.manage') }}" style="padding-left: 40px;">
+                                <i class="bi bi-arrow-right"></i> Payment Status
                             </a>
                         </li>
                         <li class="nav-item">

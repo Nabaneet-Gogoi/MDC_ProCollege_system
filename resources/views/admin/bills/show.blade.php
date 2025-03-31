@@ -126,6 +126,18 @@
                         </div>
                     @endif
                     
+                    @if($bill->bill_image)
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Bill Image:</div>
+                            <div class="col-md-8">
+                                <a href="{{ asset('storage/' . $bill->bill_image) }}" target="_blank" class="d-block">
+                                    <img src="{{ asset('storage/' . $bill->bill_image) }}" alt="Bill Image" class="img-thumbnail" style="max-height: 150px;">
+                                    <small class="d-block mt-1 text-primary">Click to view full image</small>
+                                </a>
+                            </div>
+                        </div>
+                    @endif
+                    
                     @if($bill->admin_remarks)
                         <div class="row mb-3">
                             <div class="col-md-4 fw-bold">Admin Remarks:</div>

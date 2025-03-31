@@ -97,6 +97,22 @@ This document describes the database structure for the MDC ProCollege System, in
 | description | text | Details about the bill | Nullable |
 | admin_remarks | text | Feedback from admin | Nullable |
 
+### Payment
+**Table name:** `payments`  
+**Description:** Payments made against approved bills  
+**Timestamps:** Yes (created_at, updated_at)  
+
+| Field | Type | Description | Constraints |
+|----|---|----|---|
+| payment_id | bigint | Primary identifier | Primary Key, Auto-increment |
+| bill_id | bigint | Foreign key to bills table | Foreign Key, Cascade on delete |
+| payment_amt | decimal | Payment amount in crores | Required |
+| payment_date | date | Date of payment | Required |
+| payment_status | enum | Status of payment | Values: 'pending', 'processed', 'completed', 'rejected', Default: 'pending' |
+| transaction_reference | string | Reference number for transaction | Nullable |
+| remarks | text | College remarks about payment | Nullable |
+| admin_remarks | text | Admin feedback or notes | Nullable |
+
 ### WorkCategory
 **Table name:** `work_categories`  
 **Description:** Categories of construction/development work  
@@ -198,6 +214,12 @@ This document describes the database structure for the MDC ProCollege System, in
 13. **2025_03_21_090248_create_physical_progress_table.php**
     - Creates the physical_progress table for tracking actual construction progress
 
+14. **2025_03_22_090000_create_payments_table.php**
+    - Creates the payments table for tracking payments against bills
+
+15. **2025_03_31_101829_add_admin_remarks_to_payments_table.php**
+    - Adds admin_remarks field to the payments table
+
 ## Relationships Diagram
 
 ```
@@ -217,8 +239,12 @@ Release            Bill             WorkCategory
                     |                  ^
                     | has many         |
                     v                  |
-                BillProgress ----|
+                BillProgress ----| 
                     | tracks progress of
+                    |
+                    | has many
+                    v
+                  Payment
 ```
 
 ## Notes

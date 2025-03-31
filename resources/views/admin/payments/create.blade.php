@@ -100,11 +100,11 @@
                 </div>
                 
                 <div class="row mb-3">
-                    <label for="remarks" class="col-md-3 col-form-label">Remarks</label>
+                    <label for="admin_remarks" class="col-md-3 col-form-label">Admin Remarks</label>
                     <div class="col-md-9">
-                        <textarea class="form-control @error('remarks') is-invalid @enderror" 
-                            id="remarks" name="remarks" rows="3">{{ old('remarks') }}</textarea>
-                        @error('remarks')
+                        <textarea class="form-control @error('admin_remarks') is-invalid @enderror" 
+                            id="admin_remarks" name="admin_remarks" rows="3">{{ old('admin_remarks') }}</textarea>
+                        @error('admin_remarks')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
