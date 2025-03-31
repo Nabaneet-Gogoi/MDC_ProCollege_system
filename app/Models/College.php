@@ -92,4 +92,14 @@ class College extends Model
     {
         return $this->hasMany(PhysicalProgress::class, 'college_id', 'college_id');
     }
+
+    /**
+     * Get the funding records associated with this college.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function fundings()
+    {
+        return $this->hasMany(Funding::class, 'college_id', 'college_id');
+    }
 }

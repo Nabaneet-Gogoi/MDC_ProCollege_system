@@ -28,11 +28,11 @@ class RedirectIfAuthenticated
                 // Redirect based on user role
                 $user = Auth::guard($guard)->user();
                 if ($user->isCollegeUser()) {
-                    // College user will be redirected to college dashboard (when implemented)
+                    // College user will be redirected to college dashboard
                     return redirect()->route('college.dashboard');
                 } elseif ($user->isRUSAUser()) {
-                    // RUSA user will be redirected to RUSA dashboard (when implemented)
-                    return redirect('/');
+                    // RUSA user will be redirected to RUSA dashboard
+                    return redirect()->route('rusa.dashboard');
                 }
                 
                 // Default redirect

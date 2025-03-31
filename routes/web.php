@@ -34,6 +34,12 @@ Route::middleware(['web', 'admin.auth'])->prefix('admin')->group(function () {
     Route::post('logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
     Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     
+    // Audit Logs (only accessible by superadmins)
+    Route::middleware(['superadmin'])->group(function () {
+        Route::get('audit-logs', [\App\Http\Controllers\Admin\AuditLogController::class, 'index'])->name('admin.audit-logs.index');
+        Route::get('audit-logs/{auditLog}', [\App\Http\Controllers\Admin\AuditLogController::class, 'show'])->name('admin.audit-logs.show');
+    });
+    
     // College Management
     Route::resource('colleges', CollegeController::class)->names([
         'index' => 'admin.colleges.index',
@@ -155,3 +161,36 @@ Route::middleware(['auth', 'role:college'])->prefix('college')->name('college.')
     Route::get('payments-status', 'App\Http\Controllers\College\PaymentController@manageStatus')->name('payments.status.manage');
     Route::patch('payments-status/{id}', 'App\Http\Controllers\College\PaymentController@updateStatus')->name('payments.status.update');
 });
+
+// RUSA User Routes
+Route::middleware(['auth', 'role:RUSA'])->prefix('rusa')->name('rusa.')->group(function () {
+    // Dashboard Route
+    Route::get('dashboard', 'App\Http\Controllers\RUSA\DashboardController@index')->name('dashboard');
+    
+    // Fund Utilization Route
+    Route::get('utilization', 'App\Http\Controllers\RUSA\DashboardController@fundUtilization')->name('utilization');
+    
+    // Progress Reports Route
+    Route::get('progress', 'App\Http\Controllers\RUSA\DashboardController@progressReports')->name('progress');
+    
+    // Colleges Monitoring Routes
+    Route::get('colleges', 'App\Http\Controllers\RUSA\RUSAController@colleges')->name('colleges');
+    Route::get('colleges/{id}', 'App\Http\Controllers\RUSA\RUSAController@collegeDetails')->name('colleges.details');
+    Route::get('colleges/{id}/print', 'App\Http\Controllers\RUSA\RUSAController@printCollegeDetails')->name('colleges.print');
+    
+    // Bills Monitoring Routes
+    Route::get('bills', 'App\Http\Controllers\RUSA\RUSAController@bills')->name('bills');
+    
+    // Payments Monitoring Routes
+    Route::get('payments', 'App\Http\Controllers\RUSA\RUSAController@payments')->name('payments');
+});
+
+// Bill Print Route (accessible to both admin and college users)
+Route::get('bills/{id}/print', 'App\Http\Controllers\BillPrintController@printBill')
+    ->name('bills.print')
+    ->middleware('auth');
+
+// Payment Print Route (accessible to both admin and college users)
+Route::get('payments/{id}/print', 'App\Http\Controllers\PaymentPrintController@printPayment')
+    ->name('payments.print')
+    ->middleware('auth');

@@ -194,11 +194,12 @@ class AdminController extends Controller
         
         // Get funding type distribution
         $fundingTypeData = Funding::select(
-                'funding_type',
+                DB::raw('colleges.type as funding_type'),
                 DB::raw('COUNT(*) as count'),
-                DB::raw('SUM(approved_amt) as total_amount')
+                DB::raw('SUM(fundings.approved_amt) as total_amount')
             )
-            ->groupBy('funding_type')
+            ->join('colleges', 'fundings.college_id', '=', 'colleges.college_id')
+            ->groupBy('colleges.type')
             ->get();
             
         return view('admin.dashboard', compact(

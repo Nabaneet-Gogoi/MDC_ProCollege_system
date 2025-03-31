@@ -6,8 +6,11 @@
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Payment Details</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="{{ route('college.payments.index') }}" class="btn btn-sm btn-secondary">
-                <i class="bi bi-arrow-left"></i> Back to Payment History
+            <a href="{{ route('college.payments.index') }}" class="btn btn-sm btn-secondary me-2">
+                <i class="bi bi-arrow-left"></i> Back to Payments
+            </a>
+            <a href="{{ route('payments.print', $payment->payment_id) }}" class="btn btn-sm btn-primary" target="_blank">
+                <i class="bi bi-printer"></i> Print Payment
             </a>
         </div>
     </div>

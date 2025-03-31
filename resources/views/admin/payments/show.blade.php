@@ -11,6 +11,9 @@
                     <i class="bi bi-pencil"></i> Edit Payment
                 </a>
             @endif
+            <a href="{{ route('payments.print', $payment->payment_id) }}" class="btn btn-sm btn-primary me-2" target="_blank">
+                <i class="bi bi-printer"></i> Print Payment
+            </a>
             <a href="{{ route('admin.payments.index') }}" class="btn btn-sm btn-secondary">
                 <i class="bi bi-arrow-left"></i> Back to Payments
             </a>

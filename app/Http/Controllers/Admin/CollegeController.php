@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\College;
+use App\Services\AuditLogService;
 use Illuminate\Http\Request;
 
 class CollegeController extends Controller
@@ -55,7 +56,13 @@ class CollegeController extends Controller
             $validated['phase'] = null;
         }
 
-        College::create($validated);
+        $college = College::create($validated);
+        
+        // Log the creation action
+        AuditLogService::logCreation(
+            $college,
+            "Created college: {$college->college_name}"
+        );
 
         return redirect()
             ->route('admin.colleges.index')
@@ -97,8 +104,18 @@ class CollegeController extends Controller
         if ($request->type === 'professional') {
             $validated['phase'] = null;
         }
-
+        
+        // Store old values before update
+        $oldValues = $college->toArray();
+        
         $college->update($validated);
+        
+        // Log the update action
+        AuditLogService::logUpdate(
+            $college,
+            $oldValues,
+            "Updated college: {$college->college_name}"
+        );
 
         return redirect()
             ->route('admin.colleges.index')
@@ -110,7 +127,17 @@ class CollegeController extends Controller
      */
     public function destroy(College $college)
     {
+        // Store college data before deletion
+        $collegeName = $college->college_name;
+        $collegeData = $college->toArray();
+        
         $college->delete();
+        
+        // Log the deletion action
+        AuditLogService::logDeletion(
+            $college,
+            "Deleted college: {$collegeName}"
+        );
         
         return redirect()
             ->route('admin.colleges.index')

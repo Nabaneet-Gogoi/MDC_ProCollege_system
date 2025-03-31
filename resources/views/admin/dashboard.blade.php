@@ -106,52 +106,31 @@
     
     <!-- Funding Overview Cards -->
     <div class="row mb-4">
-        <div class="col-lg-4 mb-4">
-            <div class="card h-100 bg-primary text-white">
-                <div class="card-header bg-primary border-0">
-                    <h5 class="mb-0"><i class="bi bi-currency-rupee me-1"></i> Total Funding</h5>
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100 bg-success text-white shadow">
+                <div class="card-header bg-success border-0 py-3">
+                    <h5 class="mb-0 fw-bold text-white"><i class="bi bi-graph-up me-2"></i> Fund Utilization</h5>
                 </div>
-                <div class="card-body">
-                    <div class="display-4 mb-3">₹{{ number_format($fundingInfo->total_approved ?? 0, 2) }} Cr</div>
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="small opacity-75">Central Share:</div>
-                            <div class="fs-5">₹{{ number_format($fundingInfo->total_central ?? 0, 2) }} Cr</div>
+                <div class="card-body px-4 py-4">
+                    <div class="display-3 mb-3 fw-bold text-center">{{ $utilizationPercent ?? 0 }}%</div>
+                    <div class="progress mb-4 bg-light bg-opacity-25" style="height: 12px; border-radius: 6px;">
+                        <div class="progress-bar bg-white" role="progressbar" style="width: {{ $utilizationPercent ?? 0 }}%; border-radius: 6px;" aria-valuenow="{{ $utilizationPercent ?? 0 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-3">
+                        <div class="text-center p-2">
+                            <div class="text-uppercase opacity-75 mb-1 small">Released:</div>
+                            <div class="fs-4 fw-bold">₹{{ number_format($releasedAmount ?? 0, 2) }} Cr</div>
                         </div>
-                        <div>
-                            <div class="small opacity-75">State Share:</div>
-                            <div class="fs-5">₹{{ number_format($fundingInfo->total_state ?? 0, 2) }} Cr</div>
+                        <div class="text-center p-2">
+                            <div class="text-uppercase opacity-75 mb-1 small">Utilized:</div>
+                            <div class="fs-4 fw-bold">₹{{ number_format($utilizedAmount ?? 0, 2) }} Cr</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="col-lg-4 mb-4">
-            <div class="card h-100 bg-success text-white">
-                <div class="card-header bg-success border-0">
-                    <h5 class="mb-0"><i class="bi bi-graph-up me-1"></i> Fund Utilization</h5>
-                </div>
-                <div class="card-body">
-                    <div class="display-4 mb-2">{{ $utilizationPercent ?? 0 }}%</div>
-                    <div class="progress mb-3" style="height: 10px;">
-                        <div class="progress-bar bg-white" role="progressbar" style="width: {{ $utilizationPercent ?? 0 }}%"></div>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="small opacity-75">Released:</div>
-                            <div class="fs-5">₹{{ number_format($releasedAmount ?? 0, 2) }} Cr</div>
-                        </div>
-                        <div>
-                            <div class="small opacity-75">Utilized:</div>
-                            <div class="fs-5">₹{{ number_format($utilizedAmount ?? 0, 2) }} Cr</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4 mb-4">
+        <div class="col-lg-6 mb-4">
             <div class="card h-100">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="bi bi-lightning-charge me-1"></i> Quick Actions</h5>

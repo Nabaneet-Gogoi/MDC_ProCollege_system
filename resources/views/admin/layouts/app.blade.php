@@ -231,6 +231,13 @@
                                 <i class="bi bi-currency-rupee"></i> Payments
                             </a>
                         </li>
+                        @if(auth()->guard('admin')->user() && auth()->guard('admin')->user()->role === 'superadmin')
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.audit-logs.*') ? 'active' : '' }}" href="{{ route('admin.audit-logs.index') }}">
+                                <i class="bi bi-journal-text"></i> Audit Logs
+                            </a>
+                        </li>
+                        @endif
                         <li class="nav-item">
                             <a class="nav-link" href="#">
                                 <i class="bi bi-gear"></i> Settings

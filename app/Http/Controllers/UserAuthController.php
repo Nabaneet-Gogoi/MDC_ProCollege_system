@@ -40,7 +40,7 @@ class UserAuthController extends Controller
             if ($user->isCollegeUser()) {
                 return redirect()->route('college.dashboard');
             } elseif ($user->isRUSAUser()) {
-                return redirect()->intended('/');
+                return redirect()->route('rusa.dashboard');
             }
             
             // Default redirect

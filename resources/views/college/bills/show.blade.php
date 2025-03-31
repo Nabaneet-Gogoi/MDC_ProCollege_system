@@ -10,6 +10,10 @@
                 <i class="bi bi-arrow-left"></i> Back to Bills
             </a>
             
+            <a href="{{ route('bills.print', $bill->bill_id) }}" class="btn btn-sm btn-primary me-2" target="_blank">
+                <i class="bi bi-printer"></i> Print Bill
+            </a>
+            
             @if($bill->bill_status === 'pending')
                 <a href="{{ route('college.bills.edit', $bill->bill_id) }}" class="btn btn-sm btn-primary me-2">
                     <i class="bi bi-pencil"></i> Edit Bill

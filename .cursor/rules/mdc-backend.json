@@ -1,8 +1,8 @@
 {
   "name": "MDC ProCollege System Backend Schema",
   "description": "Documentation of all database tables, entities, and their relationships in the MDC ProCollege System",
-  "version": "1.1.0",
-  "updated": "2025-03-13",
+  "version": "1.2.0",
+  "updated": "2025-04-01",
   "entities": [
     {
       "name": "Admin",
@@ -73,6 +73,7 @@
       "attributes": [
         { "name": "funding_id", "type": "bigint", "primary": true, "autoIncrement": true },
         { "name": "college_id", "type": "bigint", "references": { "table": "colleges", "column": "college_id" } },
+        { "name": "funding_name", "type": "string", "description": "Name of the funding" },
         { "name": "approved_amt", "type": "decimal", "description": "Total approved amount in crores" },
         { "name": "central_share", "type": "decimal", "description": "Central government share amount" },
         { "name": "state_share", "type": "decimal", "description": "State government share amount" },
@@ -100,19 +101,112 @@
         { "with": "Funding", "type": "belongsTo", "description": "A release belongs to a funding allocation" },
         { "with": "College", "type": "hasOneThrough", "description": "A release is associated with a college through funding" }
       ]
+    },
+    {
+      "name": "Bill",
+      "table": "bills",
+      "description": "Bills submitted by colleges for payment against funding",
+      "attributes": [
+        { "name": "bill_id", "type": "bigint", "primary": true, "autoIncrement": true },
+        { "name": "college_id", "type": "bigint", "references": { "table": "colleges", "column": "college_id" }, "onDelete": "cascade" },
+        { "name": "funding_id", "type": "bigint", "references": { "table": "fundings", "column": "funding_id" }, "onDelete": "cascade" },
+        { "name": "user_id", "type": "bigint", "references": { "table": "users", "column": "user_id" }, "onDelete": "cascade" },
+        { "name": "bill_no", "type": "string", "unique": true },
+        { "name": "bill_amt", "type": "decimal", "description": "Bill amount in crores" },
+        { "name": "bill_date", "type": "date" },
+        { "name": "bill_status", "type": "enum", "values": ["pending", "approved", "rejected", "paid"], "default": "pending" },
+        { "name": "description", "type": "text", "nullable": true },
+        { "name": "admin_remarks", "type": "text", "nullable": true }
+      ],
+      "timestamps": true,
+      "relationships": [
+        { "with": "College", "type": "belongsTo", "description": "A bill belongs to a college" },
+        { "with": "Funding", "type": "belongsTo", "description": "A bill is associated with a funding allocation" },
+        { "with": "User", "type": "belongsTo", "description": "A bill is submitted by a user" },
+        { "with": "Payment", "type": "hasMany", "description": "A bill can have multiple payments" }
+      ]
+    },
+    {
+      "name": "Payment",
+      "table": "payments",
+      "description": "Payments made against approved bills",
+      "attributes": [
+        { "name": "payment_id", "type": "bigint", "primary": true, "autoIncrement": true },
+        { "name": "bill_id", "type": "bigint", "references": { "table": "bills", "column": "bill_id" }, "onDelete": "cascade" },
+        { "name": "payment_amt", "type": "decimal", "description": "Payment amount in crores" },
+        { "name": "payment_date", "type": "date" },
+        { "name": "payment_status", "type": "enum", "values": ["pending", "processed", "completed", "rejected"], "default": "pending" },
+        { "name": "transaction_reference", "type": "string", "nullable": true },
+        { "name": "remarks", "type": "text", "nullable": true },
+        { "name": "admin_remarks", "type": "text", "nullable": true }
+      ],
+      "timestamps": true,
+      "relationships": [
+        { "with": "Bill", "type": "belongsTo", "description": "A payment belongs to a bill" }
+      ]
+    },
+    {
+      "name": "WorkCategory",
+      "table": "work_categories",
+      "description": "Categories of construction/development work",
+      "attributes": [
+        { "name": "category_id", "type": "bigint", "primary": true, "autoIncrement": true },
+        { "name": "category_name", "type": "string" },
+        { "name": "description", "type": "text", "nullable": true },
+        { "name": "is_active", "type": "boolean", "default": true }
+      ],
+      "timestamps": true,
+      "relationships": [
+        { "with": "BillProgress", "type": "hasMany", "description": "A work category can be associated with multiple bill progress records" },
+        { "with": "PhysicalProgress", "type": "hasMany", "description": "A work category can be associated with multiple physical progress records" }
+      ]
+    },
+    {
+      "name": "BillProgress",
+      "table": "bill_progress",
+      "description": "Progress of work reported with each bill",
+      "attributes": [
+        { "name": "progress_id", "type": "bigint", "primary": true, "autoIncrement": true },
+        { "name": "bill_id", "type": "bigint", "references": { "table": "bills", "column": "bill_id" } },
+        { "name": "college_id", "type": "bigint", "references": { "table": "colleges", "column": "college_id" } },
+        { "name": "category_id", "type": "bigint", "references": { "table": "work_categories", "column": "category_id" } },
+        { "name": "completion_percent", "type": "decimal" },
+        { "name": "progress_status", "type": "enum", "values": ["not_started", "in_progress", "completed"], "default": "in_progress" },
+        { "name": "description", "type": "text", "nullable": true }
+      ],
+      "timestamps": true,
+      "relationships": [
+        { "with": "Bill", "type": "belongsTo", "description": "A bill progress record belongs to a bill" },
+        { "with": "College", "type": "belongsTo", "description": "A bill progress record belongs to a college" },
+        { "with": "WorkCategory", "type": "belongsTo", "description": "A bill progress record is associated with a work category" }
+      ]
+    },
+    {
+      "name": "PhysicalProgress",
+      "table": "physical_progress",
+      "description": "Actual physical progress of construction/development work",
+      "attributes": [
+        { "name": "progress_id", "type": "bigint", "primary": true, "autoIncrement": true },
+        { "name": "college_id", "type": "bigint", "references": { "table": "colleges", "column": "college_id" } },
+        { "name": "funding_id", "type": "bigint", "references": { "table": "fundings", "column": "funding_id" } },
+        { "name": "category_id", "type": "bigint", "references": { "table": "work_categories", "column": "category_id" } },
+        { "name": "report_date", "type": "date" },
+        { "name": "completion_percent", "type": "decimal", "default": 0 },
+        { "name": "progress_status", "type": "enum", "values": ["not_started", "in_progress", "completed"], "default": "not_started" },
+        { "name": "description", "type": "text", "nullable": true },
+        { "name": "reported_by", "type": "string", "nullable": true },
+        { "name": "verified_by", "type": "string", "nullable": true },
+        { "name": "verification_date", "type": "date", "nullable": true }
+      ],
+      "timestamps": true,
+      "relationships": [
+        { "with": "College", "type": "belongsTo", "description": "A physical progress record belongs to a college" },
+        { "with": "Funding", "type": "belongsTo", "description": "A physical progress record is associated with a funding allocation" },
+        { "with": "WorkCategory", "type": "belongsTo", "description": "A physical progress record is associated with a work category" }
+      ]
     }
   ],
   "plannedEntities": [
-    {
-      "name": "Payment",
-      "description": "Future entity for recording payments from colleges",
-      "potentialAttributes": [
-        "payment_id", "college_id", "amount", "payment_date", "payment_method", "receipt_number", "description"
-      ],
-      "potentialRelationships": [
-        { "with": "College", "type": "belongsTo", "description": "Each payment is made by a college" }
-      ]
-    },
     {
       "name": "Student",
       "description": "Future entity for storing student information",
@@ -174,6 +268,36 @@
       "name": "create_releases_table",
       "filename": "database/migrations/2025_03_19_075555_create_releases_table.php",
       "description": "Creates the releases table for tracking payments against funding"
+    },
+    {
+      "name": "create_bills_table",
+      "filename": "database/migrations/2025_03_21_083533_create_bills_table.php",
+      "description": "Creates the bills table for tracking college bill submissions"
+    },
+    {
+      "name": "create_bill_progress_table",
+      "filename": "database/migrations/2025_03_21_083653_create_bill_progress_table.php",
+      "description": "Creates the bill_progress table for tracking work progress with bills"
+    },
+    {
+      "name": "create_work_categories_table",
+      "filename": "database/migrations/2025_03_21_083747_create_work_categories_table.php",
+      "description": "Creates the work_categories table for categorizing construction work"
+    },
+    {
+      "name": "create_physical_progress_table",
+      "filename": "database/migrations/2025_03_21_090248_create_physical_progress_table.php",
+      "description": "Creates the physical_progress table for tracking construction progress"
+    },
+    {
+      "name": "create_payments_table",
+      "filename": "database/migrations/2025_03_22_090000_create_payments_table.php",
+      "description": "Creates the payments table for tracking payments against bills"
+    },
+    {
+      "name": "add_admin_remarks_to_payments_table",
+      "filename": "database/migrations/2025_03_31_101829_add_admin_remarks_to_payments_table.php",
+      "description": "Adds admin_remarks field to the payments table"
     }
   ]
 } 
