@@ -41,6 +41,7 @@ class FundingController extends Controller
     {
         $request->validate([
             'college_id' => 'required|exists:colleges,college_id|unique:fundings,college_id',
+            'funding_name' => 'required|string|max:255',
             'approved_amt' => 'required|numeric|min:0',
             'central_share' => 'required|numeric|min:0',
             'state_share' => 'required|numeric|min:0',
@@ -77,6 +78,7 @@ class FundingController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
+            'funding_name' => 'required|string|max:255',
             'approved_amt' => 'required|numeric|min:0',
             'central_share' => 'required|numeric|min:0',
             'state_share' => 'required|numeric|min:0',

@@ -52,6 +52,14 @@
                     </div>
                 </div>
 
+                <div class="mb-3">
+                    <label for="funding_name" class="form-label">Funding Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control @error('funding_name') is-invalid @enderror" id="funding_name" name="funding_name" value="{{ old('funding_name', $funding->funding_name ?? '') }}" required>
+                    @error('funding_name')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label for="approved_amt" class="form-label">Approved Amount (Cr) <span class="text-danger">*</span></label>

@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\Auditable;
 
 class BillProgress extends Model
 {
-    use HasFactory;
+    use HasFactory, Auditable;
     
     /**
      * The table associated with the model.

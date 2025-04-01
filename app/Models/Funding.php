@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\Auditable;
 
 class Funding extends Model
 {
-    use HasFactory;
+    use HasFactory, Auditable;
     
     /**
      * The table associated with the model.
@@ -30,6 +31,7 @@ class Funding extends Model
      */
     protected $fillable = [
         'college_id',
+        'funding_name',
         'approved_amt',
         'central_share',
         'state_share',

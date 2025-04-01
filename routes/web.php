@@ -35,7 +35,7 @@ Route::middleware(['web', 'admin.auth'])->prefix('admin')->group(function () {
     Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     
     // Audit Logs (only accessible by superadmins)
-    Route::middleware(['superadmin'])->group(function () {
+    Route::middleware(\App\Http\Middleware\SuperAdminMiddleware::class)->group(function () {
         Route::get('audit-logs', [\App\Http\Controllers\Admin\AuditLogController::class, 'index'])->name('admin.audit-logs.index');
         Route::get('audit-logs/{auditLog}', [\App\Http\Controllers\Admin\AuditLogController::class, 'show'])->name('admin.audit-logs.show');
     });

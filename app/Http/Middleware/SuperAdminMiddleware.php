@@ -19,12 +19,18 @@ class SuperAdminMiddleware
     {
         // Check if user is authenticated as admin
         if (!Auth::guard('admin')->check()) {
+            // Store intended URL if it's a GET request
+            if ($request->isMethod('GET')) {
+                session()->put('url.intended', url()->current());
+            }
+            
             return redirect()->route('admin.login')
                 ->with('error', 'Please log in to access the admin area.');
         }
         
         // Check if the admin has superadmin role
-        if (Auth::guard('admin')->user()->role !== 'superadmin') {
+        $admin = Auth::guard('admin')->user();
+        if ($admin->role !== 'superadmin') {
             return redirect()->route('admin.dashboard')
                 ->with('error', 'You do not have permission to access that page.');
         }

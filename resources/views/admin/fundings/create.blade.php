@@ -46,6 +46,14 @@
                     @enderror
                 </div>
 
+                <div class="mb-3">
+                    <label for="funding_name" class="form-label">Funding Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control @error('funding_name') is-invalid @enderror" id="funding_name" name="funding_name" value="{{ old('funding_name') }}" required>
+                    @error('funding_name')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
                 <div class="card bg-light mb-3" id="fundingInfo" style="display: none;">
                     <div class="card-header">Funding Information</div>
                     <div class="card-body">

@@ -4,28 +4,28 @@
 
 @section('content')
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">View Audit Log #{{ $auditLog->id }}</h1>
+        <h1 class="h2">Audit Log Details</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="{{ route('admin.audit-logs.index') }}" class="btn btn-sm btn-secondary">
-                <i class="bi bi-arrow-left"></i> Back to Audit Logs
+            <a href="{{ route('admin.audit-logs.index') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back to Logs
             </a>
         </div>
     </div>
 
     <div class="card mb-4">
         <div class="card-header bg-light">
-            <i class="bi bi-info-circle me-1"></i> Audit Log Details
+            <i class="bi bi-info-circle me-1"></i> Basic Information
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6">
                     <table class="table table-borderless">
                         <tr>
-                            <th class="text-muted" style="width: 120px;">ID:</th>
+                            <th style="width: 150px;">Log ID:</th>
                             <td>{{ $auditLog->id }}</td>
                         </tr>
                         <tr>
-                            <th class="text-muted">Admin:</th>
+                            <th>Admin:</th>
                             <td>
                                 @if($auditLog->admin)
                                     {{ $auditLog->admin->name ?? $auditLog->admin->email }}
@@ -35,7 +35,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <th class="text-muted">Action:</th>
+                            <th>Action:</th>
                             <td>
                                 <span class="badge 
                                     {{ $auditLog->action == 'create' ? 'bg-success' : '' }}
@@ -52,62 +52,113 @@
                 <div class="col-md-6">
                     <table class="table table-borderless">
                         <tr>
-                            <th class="text-muted" style="width: 120px;">Model:</th>
-                            <td>
-                                {{ class_basename($auditLog->model_type) }}
-                                @if($auditLog->model_id)
-                                    #{{ $auditLog->model_id }}
-                                @endif
-                            </td>
+                            <th style="width: 150px;">Model Type:</th>
+                            <td>{{ class_basename($auditLog->model_type) }}</td>
                         </tr>
                         <tr>
-                            <th class="text-muted">Date/Time:</th>
+                            <th>Model ID:</th>
+                            <td>{{ $auditLog->model_id ?? 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date & Time:</th>
                             <td>{{ $auditLog->created_at->format('Y-m-d H:i:s') }}</td>
-                        </tr>
-                        <tr>
-                            <th class="text-muted">IP Address:</th>
-                            <td>{{ $auditLog->ip_address ?? 'N/A' }}</td>
                         </tr>
                     </table>
                 </div>
             </div>
-            
-            <hr>
-            
-            <div class="row mb-3">
-                <div class="col-12">
-                    <h5>Description</h5>
-                    <p>{{ $auditLog->description }}</p>
-                </div>
-            </div>
+        </div>
+    </div>
 
-            <div class="row">
-                @if($auditLog->old_values)
-                    <div class="col-md-6">
-                        <div class="card bg-light">
-                            <div class="card-header">
-                                <i class="bi bi-arrow-left-circle me-1"></i> Old Values
-                            </div>
-                            <div class="card-body">
-                                <pre class="mb-0" style="max-height: 400px; overflow-y: auto;">{{ json_encode($auditLog->old_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
-                            </div>
-                        </div>
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <i class="bi bi-file-text me-1"></i> Description
+        </div>
+        <div class="card-body">
+            <p>{{ $auditLog->description }}</p>
+        </div>
+    </div>
+
+    @if($auditLog->properties && count($auditLog->properties) > 0)
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <i class="bi bi-list-columns me-1"></i> Changed Properties
+            </div>
+            <div class="card-body">
+                @if(isset($auditLog->properties['old']) && isset($auditLog->properties['attributes']))
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Old Value</th>
+                                    <th>New Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($auditLog->properties['attributes'] as $key => $value)
+                                    @if(array_key_exists($key, $auditLog->properties['old']) || $auditLog->action == 'create')
+                                        <tr>
+                                            <td>{{ ucwords(str_replace('_', ' ', $key)) }}</td>
+                                            <td>
+                                                @if($auditLog->action == 'create')
+                                                    <span class="text-muted">N/A</span>
+                                                @else
+                                                    {{ $auditLog->properties['old'][$key] ?? '' }}
+                                                @endif
+                                            </td>
+                                            <td>{{ $value }}</td>
+                                        </tr>
+                                    @endif
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
-                @endif
-                
-                @if($auditLog->new_values)
-                    <div class="col-md-6">
-                        <div class="card bg-light">
-                            <div class="card-header">
-                                <i class="bi bi-arrow-right-circle me-1"></i> New Values
-                            </div>
-                            <div class="card-body">
-                                <pre class="mb-0" style="max-height: 400px; overflow-y: auto;">{{ json_encode($auditLog->new_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
-                            </div>
-                        </div>
+                @elseif($auditLog->action == 'delete' && isset($auditLog->properties['old']))
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Deleted Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($auditLog->properties['old'] as $key => $value)
+                                    <tr>
+                                        <td>{{ ucwords(str_replace('_', ' ', $key)) }}</td>
+                                        <td>{{ $value }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
+                @else
+                    <pre class="bg-light p-3 rounded">{{ json_encode($auditLog->properties, JSON_PRETTY_PRINT) }}</pre>
                 @endif
             </div>
         </div>
-    </div>
+    @endif
+
+    @if(isset($auditLog->ip_address) || isset($auditLog->user_agent))
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <i class="bi bi-hdd-network me-1"></i> Request Information
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    @if(isset($auditLog->ip_address))
+                        <div class="col-md-6">
+                            <p><strong>IP Address:</strong> {{ $auditLog->ip_address }}</p>
+                        </div>
+                    @endif
+                    
+                    @if(isset($auditLog->user_agent))
+                        <div class="col-md-6">
+                            <p><strong>User Agent:</strong> {{ $auditLog->user_agent }}</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection 

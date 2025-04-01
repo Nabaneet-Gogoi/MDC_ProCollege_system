@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Admin;
+use App\Services\AuditLogService;
 
 class AdminAuthController extends Controller
 {
@@ -66,8 +67,38 @@ class AdminAuthController extends Controller
         if (Auth::guard('admin')->attempt($credentials, $remember)) {
             $request->session()->regenerate();
             
+            // Get the admin
+            $admin = Auth::guard('admin')->user();
+            
+            // Log successful login
+            AuditLogService::logCustomAction(
+                'login',
+                $admin,
+                "Admin {$admin->email} logged in successfully",
+                null,
+                ['ip' => $request->ip(), 'user_agent' => $request->userAgent()]
+            );
+            
+            // Update last login timestamp if the column exists
+            if (schema_has_column('admins', 'last_login_at')) {
+                $admin->last_login_at = now();
+                $admin->save();
+            }
+            
             // Authentication passed
             return redirect()->intended(route('admin.dashboard'));
+        }
+
+        // Log failed login attempt if email exists
+        $admin = Admin::where('email', $request->email)->first();
+        if ($admin) {
+            AuditLogService::logCustomAction(
+                'login_failed',
+                $admin,
+                "Failed login attempt for admin {$request->email}",
+                null,
+                ['ip' => $request->ip(), 'user_agent' => $request->userAgent()]
+            );
         }
 
         // Authentication failed
@@ -84,6 +115,19 @@ class AdminAuthController extends Controller
      */
     public function logout(Request $request)
     {
+        $admin = Auth::guard('admin')->user();
+        
+        // Log the logout action if admin is authenticated
+        if ($admin) {
+            AuditLogService::logCustomAction(
+                'logout',
+                $admin,
+                "Admin {$admin->email} logged out",
+                null,
+                ['ip' => $request->ip(), 'user_agent' => $request->userAgent()]
+            );
+        }
+        
         Auth::guard('admin')->logout();
 
         $request->session()->invalidate();

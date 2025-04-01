@@ -1,3 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: Description of the database in the project. keeps track of updates, make sure to keep it updated
+globs: 
+alwaysApply: false
+---
+---
 description: Description of the database in the project. keeps track of updates, make sure to keep it updated
 globs: 
 alwaysApply: false
@@ -15,14 +26,11 @@ This document describes the database structure for the MDC ProCollege System, in
 **Timestamps:** Yes (created_at, updated_at)  
 
 | Field | Type | Description | Constraints |
-|----|---|----|---|
-| id | bigint | Primary identifier | Primary Key, Auto-increment |
-| name | string | Admin's full name | Required |
-| email | string | Admin email address | Unique, Required |
-| username | string | Login username | Unique, Required |
+|-------|------|-------------|------------|
+| admin_id | bigint | Primary identifier | Primary Key, Auto-increment |
+| email | string | Admin email address | Unique |
 | password | string | Encrypted password | Hashed using bcrypt |
-| role | string | Admin role | Default: 'admin' |
-| remember_token | string | For "remember me" functionality | Nullable |
+| phone_no | string | Contact number | Nullable |
 
 ### User
 **Table name:** `users`  
@@ -30,13 +38,15 @@ This document describes the database structure for the MDC ProCollege System, in
 **Timestamps:** Yes (created_at, updated_at)  
 
 | Field | Type | Description | Constraints |
-|----|---|----|---|
+|-------|------|-------------|------------|
 | user_id | bigint | Primary identifier | Primary Key, Auto-increment |
-| username | string | Login username | Unique, Required |
+| college_id | bigint | Foreign key to colleges table | Foreign Key |
+| name | string | Full name of the user | Required |
+| email | string | User email address | Required, Unique |
 | password | string | Encrypted password | Hashed using bcrypt |
-| role | enum | User role in the system | Values: 'college', 'RUSA' |
-| college_id | bigint | Foreign key to colleges table | Foreign Key, Nullable for RUSA users |
-| remember_token | string | For "remember me" functionality | Nullable |
+| phone_no | string | Contact number | Required |
+| role | enum | User role in the system | Values: 'college_admin', 'staff' |
+| status | enum | Account status | Values: 'active', 'inactive', Default: 'active' |
 
 ### College
 **Table name:** `colleges`  
@@ -44,7 +54,7 @@ This document describes the database structure for the MDC ProCollege System, in
 **Timestamps:** Yes (created_at, updated_at)  
 
 | Field | Type | Description | Constraints |
-|----|---|----|---|
+|-------|------|-------------|------------|
 | college_id | bigint | Primary identifier | Primary Key, Auto-increment |
 | college_name | string | Name of the college | Required |
 | state | string | State where college is located | Required |
@@ -58,7 +68,7 @@ This document describes the database structure for the MDC ProCollege System, in
 **Timestamps:** Yes (created_at, updated_at)  
 
 | Field | Type | Description | Constraints |
-|----|---|----|---|
+|-------|------|-------------|------------|
 | funding_id | bigint | Primary identifier | Primary Key, Auto-increment |
 | college_id | bigint | Foreign key to colleges table | Foreign Key |
 | approved_amt | decimal | Total approved funding amount | Required |
@@ -72,7 +82,7 @@ This document describes the database structure for the MDC ProCollege System, in
 **Timestamps:** Yes (created_at, updated_at)  
 
 | Field | Type | Description | Constraints |
-|----|---|----|---|
+|-------|------|-------------|------------|
 | release_id | bigint | Primary identifier | Primary Key, Auto-increment |
 | funding_id | bigint | Foreign key to fundings table | Foreign Key |
 | release_amt | decimal | Amount released | Required |
@@ -85,11 +95,11 @@ This document describes the database structure for the MDC ProCollege System, in
 **Timestamps:** Yes (created_at, updated_at)  
 
 | Field | Type | Description | Constraints |
-|----|---|----|---|
+|-------|------|-------------|------------|
 | bill_id | bigint | Primary identifier | Primary Key, Auto-increment |
-| college_id | bigint | Foreign key to colleges table | Foreign Key, Cascade on delete |
-| funding_id | bigint | Foreign key to fundings table | Foreign Key, Cascade on delete |
-| user_id | bigint | User who submitted the bill | Foreign Key, Cascade on delete |
+| college_id | bigint | Foreign key to colleges table | Foreign Key |
+| funding_id | bigint | Foreign key to fundings table | Foreign Key |
+| user_id | bigint | User who submitted the bill | Foreign Key |
 | bill_no | string | Unique bill number | Unique |
 | bill_amt | decimal | Bill amount in crores | Required |
 | bill_date | date | Date of the bill | Required |
@@ -97,29 +107,13 @@ This document describes the database structure for the MDC ProCollege System, in
 | description | text | Details about the bill | Nullable |
 | admin_remarks | text | Feedback from admin | Nullable |
 
-### Payment
-**Table name:** `payments`  
-**Description:** Payments made against approved bills  
-**Timestamps:** Yes (created_at, updated_at)  
-
-| Field | Type | Description | Constraints |
-|----|---|----|---|
-| payment_id | bigint | Primary identifier | Primary Key, Auto-increment |
-| bill_id | bigint | Foreign key to bills table | Foreign Key, Cascade on delete |
-| payment_amt | decimal | Payment amount in crores | Required |
-| payment_date | date | Date of payment | Required |
-| payment_status | enum | Status of payment | Values: 'pending', 'processed', 'completed', 'rejected', Default: 'pending' |
-| transaction_reference | string | Reference number for transaction | Nullable |
-| remarks | text | College remarks about payment | Nullable |
-| admin_remarks | text | Admin feedback or notes | Nullable |
-
 ### WorkCategory
 **Table name:** `work_categories`  
 **Description:** Categories of construction/development work  
 **Timestamps:** Yes (created_at, updated_at)  
 
 | Field | Type | Description | Constraints |
-|----|---|----|---|
+|-------|------|-------------|------------|
 | category_id | bigint | Primary identifier | Primary Key, Auto-increment |
 | category_name | string | Name of the work category | Required |
 | description | text | Details about the category | Nullable |
@@ -131,7 +125,7 @@ This document describes the database structure for the MDC ProCollege System, in
 **Timestamps:** Yes (created_at, updated_at)  
 
 | Field | Type | Description | Constraints |
-|----|---|----|---|
+|-------|------|-------------|------------|
 | progress_id | bigint | Primary identifier | Primary Key, Auto-increment |
 | bill_id | bigint | Foreign key to bills table | Foreign Key |
 | college_id | bigint | Foreign key to colleges table | Foreign Key |
@@ -146,7 +140,7 @@ This document describes the database structure for the MDC ProCollege System, in
 **Timestamps:** Yes (created_at, updated_at)  
 
 | Field | Type | Description | Constraints |
-|----|---|----|---|
+|-------|------|-------------|------------|
 | progress_id | bigint | Primary identifier | Primary Key, Auto-increment |
 | college_id | bigint | Foreign key to colleges table | Foreign Key |
 | funding_id | bigint | Foreign key to fundings table | Foreign Key |
@@ -165,7 +159,7 @@ This document describes the database structure for the MDC ProCollege System, in
 **Timestamps:** No  
 
 | Field | Type | Description | Constraints |
-|----|---|----|---|
+|-------|------|-------------|------------|
 | id | string | Session identifier | Primary Key |
 | user_id | bigint | FK to users table | Nullable, Indexed |
 | ip_address | string | User's IP address | Nullable |
@@ -175,50 +169,45 @@ This document describes the database structure for the MDC ProCollege System, in
 
 ## Migration Files
 
-1. **2025_03_11_083657_create_admins_table.php**
-   - Creates the original admins table structure
+1. **create_admins_table**
+   - File: `database/migrations/2025_03_11_083657_create_admins_table.php`
+   - Creates the admin table for system administrators
 
-2. **2025_03_11_080934_create_sessions_table.php**
+2. **create_sessions_table**
+   - File: `database/migrations/2025_03_11_093013_create_sessions_table.php`
    - Creates the sessions table for auth sessions
 
-3. **2025_03_11_092440_fix_admin_password.php**
-   - Updates admin password fields
-
-4. **2025_03_11_093013_create_sessions_table.php**
-   - Updated sessions table structure
-
-5. **2025_03_12_075929_create_colleges_table.php**
+3. **create_colleges_table**
+   - File: `database/migrations/2025_03_12_075929_create_colleges_table.php`
    - Creates the colleges table for educational institutions
 
-6. **2025_03_13_094852_create_users_table.php**
-   - Creates the users table with college and RUSA roles
+4. **create_users_table**
+   - File: `database/migrations/2025_03_13_094852_create_users_table.php`
+   - Creates the users table for college staff members
 
-7. **2025_03_17_104041_create_admins_table.php**
-   - Updates the admins table with new fields and creates a default admin user
-
-8. **2025_03_17_164552_create_fundings_table.php**
+5. **create_fundings_table**
+   - File: `database/migrations/2025_03_17_164552_create_fundings_table.php`
    - Creates the fundings table for college funding allocations
 
-9. **2025_03_19_075555_create_releases_table.php**
+6. **create_releases_table**
+   - File: `database/migrations/2025_03_19_075555_create_releases_table.php`
    - Creates the releases table for fund release transactions
 
-10. **2025_03_21_083533_create_bills_table.php**
-    - Creates the bills table for tracking college bill submissions
+7. **create_bills_table**
+   - File: `database/migrations/2025_03_21_083533_create_bills_table.php`
+   - Creates the bills table for tracking college bill submissions
 
-11. **2025_03_21_083653_create_bill_progress_table.php**
-    - Creates the bill_progress table for tracking work progress reported with bills
+8. **create_bill_progress_table**
+   - File: `database/migrations/2025_03_21_083653_create_bill_progress_table.php`
+   - Creates the bill_progress table for tracking work progress reported with bills
 
-12. **2025_03_21_083747_create_work_categories_table.php**
-    - Creates the work_categories table for categorizing construction work
+9. **create_work_categories_table**
+   - File: `database/migrations/2025_03_21_083747_create_work_categories_table.php`
+   - Creates the work_categories table for categorizing construction work
 
-13. **2025_03_21_090248_create_physical_progress_table.php**
+10. **create_physical_progress_table**
+    - File: `database/migrations/2025_03_21_090248_create_physical_progress_table.php`
     - Creates the physical_progress table for tracking actual construction progress
-
-14. **2025_03_22_090000_create_payments_table.php**
-    - Creates the payments table for tracking payments against bills
-
-15. **2025_03_31_101829_add_admin_remarks_to_payments_table.php**
-    - Adds admin_remarks field to the payments table
 
 ## Relationships Diagram
 
@@ -228,7 +217,7 @@ Admin
   | manages
   v
 College
-  |----|---|
+  |-------------------|------------------|
   | has one           | has many         | has many
   v                   v                  v
 Funding            User              PhysicalProgress
@@ -239,12 +228,8 @@ Release            Bill             WorkCategory
                     |                  ^
                     | has many         |
                     v                  |
-                BillProgress ----| 
+                BillProgress ----------|
                     | tracks progress of
-                    |
-                    | has many
-                    v
-                  Payment
 ```
 
 ## Notes
@@ -260,5 +245,3 @@ Release            Bill             WorkCategory
 - Bill progress tracks work reported with each bill submission
 - Physical progress tracks the actual construction progress verified on site
 - All tables use appropriate indexes for optimized queries
-- Users can have either 'college' or 'RUSA' roles, with college users linked to a specific college
-- The admin table includes a default admin user created during migration 

@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Notifications\Notifiable;
+use App\Traits\Auditable;
 
 class Admin extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, Auditable;
 
     /**
      * The table associated with the model.
@@ -30,6 +31,7 @@ class Admin extends Authenticatable
         'email',
         'password',
         'phone_no',
+        'role',
     ];
 
     /**
@@ -39,6 +41,15 @@ class Admin extends Authenticatable
      */
     protected $hidden = [
         'password',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'last_login_at' => 'datetime',
     ];
 
     /**
@@ -56,9 +67,9 @@ class Admin extends Authenticatable
 
     /**
      * Indicates if the model should be timestamped.
-     * Set to false if your table doesn't have created_at and updated_at columns.
+     * Set to true to add created_at and updated_at columns.
      *
      * @var bool
      */
-    public $timestamps = false;
+    public $timestamps = true;
 }

@@ -1,8 +1,8 @@
 {
   "name": "MDC ProCollege System Backend Schema",
   "description": "Documentation of all database tables, entities, and their relationships in the MDC ProCollege System",
-  "version": "1.2.0",
-  "updated": "2025-04-01",
+  "version": "1.3.0",
+  "updated": "2025-05-15",
   "entities": [
     {
       "name": "Admin",
