@@ -1,18 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - MDC ProCollege System</title>
-    @vite('resources/css/app.css')
-    <style>
-        /* Fallback styles in case Tailwind isn't loaded properly */
-        body { background-color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; }
-        label, button, input, h1, h2 { color: #000; }
-        .login-container { background-color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 0.5rem; padding: 2rem; max-width: 28rem; margin: 2rem auto; }
-    </style>
-</head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+@extends('layouts.app')
+
+@section('title', 'Login - MDC ProCollege System')
+
+@push('styles')
+<style>
+    /* Styles specific to login page content */
+    .login-page-wrapper {
+        display: flex;
+        flex-grow: 1; /* Ensure it takes available vertical space */
+        align-items: center;
+        justify-content: center;
+        background-color: #f3f4f6; /* Original body background */
+        padding: 2rem 0; /* Add some padding for smaller screens */
+    }
+    .login-container {
+        background-color: white;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border-radius: 0.5rem;
+        padding: 2rem;
+        max-width: 28rem;
+        width: 90%; /* Responsive width */
+        margin: 0 auto; /* Centering if flex container changes */
+    }
+    /* Ensure inputs and labels inherit color correctly if not overridden by Tailwind */
+    .login-container label, .login-container button, .login-container input, .login-container h1, .login-container h2 {
+        color: #000;
+    }
+</style>
+@endpush
+
+@section('content')
+<div class="login-page-wrapper">
     <div class="max-w-md w-full bg-white rounded-lg shadow-lg p-8 m-4 login-container">
         <div class="flex justify-center mb-8">
             <h1 class="text-3xl font-bold text-black">MDC ProCollege System</h1>
@@ -66,5 +84,5 @@
             </a>
         </div>
     </div>
-</body>
-</html> 
+</div>
+@endsection 
