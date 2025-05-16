@@ -1,14 +1,4 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
----
-description: Description of the database in the project. keeps track of updates, make sure to keep it updated
-globs: 
-alwaysApply: false
----
----
 description: Description of the database in the project. keeps track of updates, make sure to keep it updated
 globs: 
 alwaysApply: false

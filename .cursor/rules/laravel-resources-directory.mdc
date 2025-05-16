@@ -1,10 +1,5 @@
 ---
 description: Understanding Laravel resources directory
-globs: 
-alwaysApply: false
----
----
-description: Understanding Laravel resources directory
 globs: [resources/**/*]
 alwaysApply: false
 ---
