@@ -204,6 +204,31 @@
         { "with": "Funding", "type": "belongsTo", "description": "A physical progress record is associated with a funding allocation" },
         { "with": "WorkCategory", "type": "belongsTo", "description": "A physical progress record is associated with a work category" }
       ]
+    },
+    {
+      "name": "AuditLog",
+      "table": "audit_logs",
+      "description": "Logs actions performed by users, especially admins, for auditing purposes.",
+      "attributes": [
+        { "name": "id", "type": "bigint", "primary": true, "autoIncrement": true },
+        { "name": "admin_id", "type": "bigint", "nullable": true, "references": { "table": "admins", "column": "admin_id" }, "onDelete": "set null" },
+        { "name": "action", "type": "string", "description": "The action performed (e.g., created, updated, deleted)." },
+        { "name": "model_type", "type": "string", "description": "The model that was affected (e.g., App\\Models\\College)." },
+        { "name": "model_id", "type": "unsignedBigInteger", "nullable": true, "description": "The ID of the affected model instance." },
+        { "name": "description", "type": "text", "description": "A human-readable description of the action." },
+        { "name": "old_values", "type": "json", "nullable": true, "description": "The model attributes before the change." },
+        { "name": "new_values", "type": "json", "nullable": true, "description": "The model attributes after the change." },
+        { "name": "ip_address", "type": "string", "nullable": true },
+        { "name": "user_agent", "type": "string", "nullable": true }
+      ],
+      "timestamps": true,
+      "relationships": [
+        { "with": "Admin", "type": "belongsTo", "description": "An audit log entry may be associated with an admin.", "nullable": true }
+      ],
+      "indexes": [
+        { "columns": ["model_type", "model_id"], "type": "index" },
+        { "columns": ["action"], "type": "index" }
+      ]
     }
   ],
   "plannedEntities": [
@@ -236,6 +261,16 @@
       "potentialRelationships": [
         { "with": "Department", "type": "belongsTo", "description": "Each course belongs to a department" }
       ]
+    },
+    {
+      "name": "add_admin_remarks_to_payments_table",
+      "filename": "database/migrations/2025_03_31_101829_add_admin_remarks_to_payments_table.php",
+      "description": "Adds admin_remarks field to the payments table"
+    },
+    {
+      "name": "create_audit_logs_table",
+      "filename": "database/migrations/2025_03_31_175954_create_audit_logs_table.php",
+      "description": "Creates the audit_logs table for tracking user actions"
     }
   ],
   "migrations": [

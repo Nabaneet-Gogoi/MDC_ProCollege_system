@@ -1,237 +1,74 @@
 ---
-description: Description of the database in the project. keeps track of updates, make sure to keep it updated
-globs: 
+description:
+globs:
 alwaysApply: false
 ---
-# MDC ProCollege System Database Schema
+- All tables use appropriate indexes for optimized queries
 
-## Overview
-This document describes the database structure for the MDC ProCollege System, including all tables, their fields, and relationships.
-
-## Current Entities
-
-### Admin
-**Table name:** `admins`  
-**Description:** System administrators who manage the application  
-**Timestamps:** Yes (created_at, updated_at)  
+### AuditLog
+**Table name:** `audit_logs`
+**Description:** Logs actions performed by users, particularly administrators, for auditing and tracking changes within the system.
+**Timestamps:** Yes (created_at, updated_at)
 
 | Field | Type | Description | Constraints |
-|-------|------|-------------|------------|
-| admin_id | bigint | Primary identifier | Primary Key, Auto-increment |
-| email | string | Admin email address | Unique |
-| password | string | Encrypted password | Hashed using bcrypt |
-| phone_no | string | Contact number | Nullable |
+|----|---|----|---|
+| id | bigint | Primary identifier | Primary Key, Auto-increment |
+| admin_id | bigint | Foreign key to admins table | Foreign Key (admins.admin_id), Nullable, On delete: SET NULL |
+| action | string | The type of action performed (e.g., 'created', 'updated', 'deleted') | Required |
+| model_type | string | The class name of the model that was affected (e.g., 'App\Models\College') | Required |
+| model_id | unsignedBigInteger | The ID of the affected model instance | Nullable |
+| description | text | A human-readable description of the audit event | Required |
+| old_values | json | JSON representation of the model's attributes before the change | Nullable |
+| new_values | json | JSON representation of the model's attributes after the change | Nullable |
+| ip_address | string | IP address of the user performing the action | Nullable |
+| user_agent | string | User agent string of the client | Nullable |
 
-### User
-**Table name:** `users`  
-**Description:** College users who can manage their college's funding and releases  
-**Timestamps:** Yes (created_at, updated_at)  
-
-| Field | Type | Description | Constraints |
-|-------|------|-------------|------------|
-| user_id | bigint | Primary identifier | Primary Key, Auto-increment |
-| college_id | bigint | Foreign key to colleges table | Foreign Key |
-| name | string | Full name of the user | Required |
-| email | string | User email address | Required, Unique |
-| password | string | Encrypted password | Hashed using bcrypt |
-| phone_no | string | Contact number | Required |
-| role | enum | User role in the system | Values: 'college_admin', 'staff' |
-| status | enum | Account status | Values: 'active', 'inactive', Default: 'active' |
-
-### College
-**Table name:** `colleges`  
-**Description:** Educational institutions managed in the system  
-**Timestamps:** Yes (created_at, updated_at)  
-
-| Field | Type | Description | Constraints |
-|-------|------|-------------|------------|
-| college_id | bigint | Primary identifier | Primary Key, Auto-increment |
-| college_name | string | Name of the college | Required |
-| state | string | State where college is located | Required |
-| district | string | District where college is located | Required |
-| type | enum | Type of college | Values: 'professional', 'MDC' |
-| phase | enum | Implementation phase | Values: '1', '2' |
-
-### Funding
-**Table name:** `fundings`  
-**Description:** Funding allocations for colleges  
-**Timestamps:** Yes (created_at, updated_at)  
-
-| Field | Type | Description | Constraints |
-|-------|------|-------------|------------|
-| funding_id | bigint | Primary identifier | Primary Key, Auto-increment |
-| college_id | bigint | Foreign key to colleges table | Foreign Key |
-| approved_amt | decimal | Total approved funding amount | Required |
-| central_share | decimal | Central government's share | Required |
-| state_share | decimal | State government's share | Required |
-| utilization_status | enum | Current utilization status | Values: 'not_started', 'in_progress', 'completed' |
-
-### Release
-**Table name:** `releases`  
-**Description:** Fund releases against allocated fundings  
-**Timestamps:** Yes (created_at, updated_at)  
-
-| Field | Type | Description | Constraints |
-|-------|------|-------------|------------|
-| release_id | bigint | Primary identifier | Primary Key, Auto-increment |
-| funding_id | bigint | Foreign key to fundings table | Foreign Key |
-| release_amt | decimal | Amount released | Required |
-| release_date | date | Date of fund release | Required |
-| desc | text | Description or purpose of release | Required |
-
-### Bill
-**Table name:** `bills`  
-**Description:** Bills submitted by colleges for payment against funding  
-**Timestamps:** Yes (created_at, updated_at)  
-
-| Field | Type | Description | Constraints |
-|-------|------|-------------|------------|
-| bill_id | bigint | Primary identifier | Primary Key, Auto-increment |
-| college_id | bigint | Foreign key to colleges table | Foreign Key |
-| funding_id | bigint | Foreign key to fundings table | Foreign Key |
-| user_id | bigint | User who submitted the bill | Foreign Key |
-| bill_no | string | Unique bill number | Unique |
-| bill_amt | decimal | Bill amount in crores | Required |
-| bill_date | date | Date of the bill | Required |
-| bill_status | enum | Status of the bill | Values: 'pending', 'approved', 'rejected', 'paid', Default: 'pending' |
-| description | text | Details about the bill | Nullable |
-| admin_remarks | text | Feedback from admin | Nullable |
-
-### WorkCategory
-**Table name:** `work_categories`  
-**Description:** Categories of construction/development work  
-**Timestamps:** Yes (created_at, updated_at)  
-
-| Field | Type | Description | Constraints |
-|-------|------|-------------|------------|
-| category_id | bigint | Primary identifier | Primary Key, Auto-increment |
-| category_name | string | Name of the work category | Required |
-| description | text | Details about the category | Nullable |
-| is_active | boolean | Whether category is active | Default: true |
-
-### BillProgress
-**Table name:** `bill_progress`  
-**Description:** Progress of work reported with each bill  
-**Timestamps:** Yes (created_at, updated_at)  
-
-| Field | Type | Description | Constraints |
-|-------|------|-------------|------------|
-| progress_id | bigint | Primary identifier | Primary Key, Auto-increment |
-| bill_id | bigint | Foreign key to bills table | Foreign Key |
-| college_id | bigint | Foreign key to colleges table | Foreign Key |
-| category_id | bigint | Foreign key to work_categories table | Foreign Key |
-| completion_percent | decimal | Percentage of work completed | Required |
-| progress_status | enum | Status of progress | Values: 'not_started', 'in_progress', 'completed', Default: 'in_progress' |
-| description | text | Details about the progress | Nullable |
-
-### PhysicalProgress
-**Table name:** `physical_progress`  
-**Description:** Actual physical progress of construction/development work  
-**Timestamps:** Yes (created_at, updated_at)  
-
-| Field | Type | Description | Constraints |
-|-------|------|-------------|------------|
-| progress_id | bigint | Primary identifier | Primary Key, Auto-increment |
-| college_id | bigint | Foreign key to colleges table | Foreign Key |
-| funding_id | bigint | Foreign key to fundings table | Foreign Key |
-| category_id | bigint | Foreign key to work_categories table | Foreign Key |
-| report_date | date | Date of progress report | Required |
-| completion_percent | decimal | Percentage of completion | Default: 0 |
-| progress_status | enum | Status of progress | Values: 'not_started', 'in_progress', 'completed', Default: 'not_started' |
-| description | text | Details about the progress | Nullable |
-| reported_by | string | Person who reported progress | Nullable |
-| verified_by | string | Person who verified progress | Nullable |
-| verification_date | date | Date of verification | Nullable |
-
-### Session
-**Table name:** `sessions`  
-**Description:** User session data for authentication  
-**Timestamps:** No  
-
-| Field | Type | Description | Constraints |
-|-------|------|-------------|------------|
-| id | string | Session identifier | Primary Key |
-| user_id | bigint | FK to users table | Nullable, Indexed |
-| ip_address | string | User's IP address | Nullable |
-| user_agent | text | User's browser info | Nullable |
-| payload | text | Session data | Required |
-| last_activity | integer | Timestamp of last activity | Indexed |
+**Indexes:** `(model_type, model_id)`, `(action)`
 
 ## Migration Files
 
-1. **create_admins_table**
-   - File: `database/migrations/2025_03_11_083657_create_admins_table.php`
-   - Creates the admin table for system administrators
+1.  **create_admins_table**
+    *   File: `database/migrations/2025_03_11_083657_create_admins_table.php`
+    *   Creates the admin table for system administrators
 
-2. **create_sessions_table**
-   - File: `database/migrations/2025_03_11_093013_create_sessions_table.php`
-   - Creates the sessions table for auth sessions
+2.  **create_sessions_table**
+    *   File: `database/migrations/2025_03_11_093013_create_sessions_table.php`
+    *   Creates the sessions table for auth sessions
 
-3. **create_colleges_table**
-   - File: `database/migrations/2025_03_12_075929_create_colleges_table.php`
-   - Creates the colleges table for educational institutions
+3.  **create_colleges_table**
+    *   File: `database/migrations/2025_03_12_075929_create_colleges_table.php`
+    *   Creates the colleges table for educational institutions
 
-4. **create_users_table**
-   - File: `database/migrations/2025_03_13_094852_create_users_table.php`
-   - Creates the users table for college staff members
+4.  **create_users_table**
+    *   File: `database/migrations/2025_03_13_094852_create_users_table.php`
+    *   Creates the users table for college staff members
 
-5. **create_fundings_table**
-   - File: `database/migrations/2025_03_17_164552_create_fundings_table.php`
-   - Creates the fundings table for college funding allocations
+5.  **create_fundings_table**
+    *   File: `database/migrations/2025_03_17_164552_create_fundings_table.php`
+    *   Creates the fundings table for college funding allocations
 
-6. **create_releases_table**
-   - File: `database/migrations/2025_03_19_075555_create_releases_table.php`
-   - Creates the releases table for fund release transactions
+6.  **create_releases_table**
+    *   File: `database/migrations/2025_03_19_075555_create_releases_table.php`
+    *   Creates the releases table for fund release transactions
 
-7. **create_bills_table**
-   - File: `database/migrations/2025_03_21_083533_create_bills_table.php`
-   - Creates the bills table for tracking college bill submissions
+7.  **create_bills_table**
+    *   File: `database/migrations/2025_03_21_083533_create_bills_table.php`
+    *   Creates the bills table for tracking college bill submissions
 
-8. **create_bill_progress_table**
-   - File: `database/migrations/2025_03_21_083653_create_bill_progress_table.php`
-   - Creates the bill_progress table for tracking work progress reported with bills
+8.  **create_bill_progress_table**
+    *   File: `database/migrations/2025_03_21_083653_create_bill_progress_table.php`
+    *   Creates the bill_progress table for tracking work progress reported with bills
 
-9. **create_work_categories_table**
-   - File: `database/migrations/2025_03_21_083747_create_work_categories_table.php`
-   - Creates the work_categories table for categorizing construction work
+9.  **create_work_categories_table**
+    *   File: `database/migrations/2025_03_21_083747_create_work_categories_table.php`
+    *   Creates the work_categories table for categorizing construction work
 
 10. **create_physical_progress_table**
-    - File: `database/migrations/2025_03_21_090248_create_physical_progress_table.php`
-    - Creates the physical_progress table for tracking actual construction progress
+    *   File: `database/migrations/2025_03_21_090248_create_physical_progress_table.php`
+    *   Creates the physical_progress table for tracking actual construction progress
+
+11. **create_audit_logs_table**
+    *   File: `database/migrations/2025_03_31_175954_create_audit_logs_table.php`
+    *   Creates the `audit_logs` table for recording system actions
 
 ## Relationships Diagram
-
-```
-Admin
-  |
-  | manages
-  v
-College
-  |-------------------|------------------|
-  | has one           | has many         | has many
-  v                   v                  v
-Funding            User              PhysicalProgress
-  |                   |                  |
-  | has many          | submits          | belongs to
-  v                   v                  v
-Release            Bill             WorkCategory
-                    |                  ^
-                    | has many         |
-                    v                  |
-                BillProgress ----------|
-                    | tracks progress of
-```
-
-## Notes
-- The system focuses on college management, funding, and construction progress tracking
-- Funding is allocated to colleges based on their type and phase:
-  - MDC Phase 1: 8 crores (Central:State = 50:50)
-  - MDC Phase 2: 12 crores (Central:State = 90:10)
-  - Professional: 26 crores (Central:State = 90:10)
-- Fund releases are tracked against funding allocations with remaining balance calculations
-- Bills are submitted by colleges for construction work and require admin approval
-- Physical progress of construction is tracked separately from bills
-- Work is categorized (e.g., foundation, walls, roof) for detailed progress tracking
-- Bill progress tracks work reported with each bill submission
-- Physical progress tracks the actual construction progress verified on site
-- All tables use appropriate indexes for optimized queries

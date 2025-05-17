@@ -40,12 +40,14 @@ The application is organized into the following key modules:
 - Role-based access control
 - Secure login with password hashing
 - Session management and remember-me functionality
+- Audit logging of important user actions (especially admin actions)
 
 ### 3.2 College Management
 - Registration and management of colleges
 - Categorization by type (MDC, Professional) and phase (1, 2)
 - Geographic organization by state and district
 - College profile management
+- Audit logging for sensitive operations
 
 ### 3.3 Funding Management
 - Allocation of funds to colleges based on type and phase
@@ -147,7 +149,7 @@ The application is organized into the following key modules:
 ## 6. Technical Specifications
 
 ### 6.1 Database Design
-The system uses a relational database with 11 primary entities:
+The system uses a relational database with 12 primary entities:
 - Admin
 - User
 - College
@@ -159,6 +161,7 @@ The system uses a relational database with 11 primary entities:
 - BillProgress
 - PhysicalProgress
 - Session
+- AuditLog
 
 See the database schema documentation for detailed structure and relationships.
 
@@ -177,7 +180,7 @@ The system provides RESTful API endpoints for core functionality:
 - Secure password hashing
 - Role-based access control
 - Session timeout and management
-- Audit logging for sensitive operations
+- Audit logging for sensitive operations and data changes
 
 ## 7. Installation and Setup
 
