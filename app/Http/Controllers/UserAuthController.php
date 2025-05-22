@@ -106,6 +106,13 @@ class UserAuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        $user = Auth::user();
+        if ($user && $user->isCollegeUser()) {
+            \Log::info('Logout: College user redirecting to college.dashboard');
+            return redirect()->route('college.dashboard');
+        } else {
+            \Log::info('Logout: Redirecting to /');
+            return redirect('/');
+        }
     }
 } 

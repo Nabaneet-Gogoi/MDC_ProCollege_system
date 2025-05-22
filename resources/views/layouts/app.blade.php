@@ -138,7 +138,7 @@ use Illuminate\Support\Facades\Auth;
                 <p>Department of Higher Education, Government of India</p>
                 <div class="rusa-title">RASHTRIYA UCHCHATAR SHIKSHA ABHIYAN</div>
             </div>
-            <img src="https://rusa.assam.gov.in/resourcefiles/images/rusa-logo.png" alt="RUSA Logo" class="logo-right">
+            <img src="{{ asset('img/RUSA-logo.png') }}" alt="RUSA Logo" class="logo-right">
         </header>
 
         <nav class="blue-navbar">
