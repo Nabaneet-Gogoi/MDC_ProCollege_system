@@ -10,7 +10,7 @@
         flex-grow: 1; /* Ensure it takes available vertical space */
         align-items: center;
         justify-content: center;
-        background-color: #f3f4f6; /* Original body background */
+        background-color:rgb(255, 255, 255); /* Original body background */
         padding: 2rem 0; /* Add some padding for smaller screens */
     }
     .login-container {
