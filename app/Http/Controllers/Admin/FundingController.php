@@ -13,9 +13,45 @@ class FundingController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $fundings = Funding::with('college')->get();
+        $query = Funding::with('college');
+
+        // Filter by college_id
+        if ($request->filled('college_id')) {
+            $query->where('college_id', $request->input('college_id'));
+        }
+
+        // Filter by college type
+        if ($request->filled('type')) {
+            $query->whereHas('college', function ($q) use ($request) {
+                $q->where('type', $request->input('type'));
+            });
+        }
+
+        // Filter by college phase
+        if ($request->filled('phase')) {
+            $query->whereHas('college', function ($q) use ($request) {
+                $q->where('phase', $request->input('phase'));
+            });
+        }
+
+        // Filter by utilization status
+        if ($request->filled('status')) {
+            $query->where('utilization_status', $request->input('status'));
+        }
+
+        // Filter by min amount
+        if ($request->filled('min_amount')) {
+            $query->where('approved_amt', '>=', $request->input('min_amount'));
+        }
+
+        // Filter by max amount
+        if ($request->filled('max_amount')) {
+            $query->where('approved_amt', '<=', $request->input('max_amount'));
+        }
+
+        $fundings = $query->orderBy('funding_id')->paginate(10)->withQueryString();
         return view('admin.fundings.index', compact('fundings'));
     }
 

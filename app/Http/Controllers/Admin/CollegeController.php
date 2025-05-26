@@ -21,9 +21,31 @@ class CollegeController extends Controller
     /**
      * Display a listing of the colleges.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $colleges = College::orderBy('college_id')->paginate(10);
+        $query = College::query();
+
+        // Filter by state
+        if ($request->filled('state')) {
+            $query->where('state', $request->input('state'));
+        }
+
+        // Filter by district
+        if ($request->filled('district')) {
+            $query->where('district', $request->input('district'));
+        }
+
+        // Filter by type
+        if ($request->filled('type')) {
+            $query->where('type', $request->input('type'));
+        }
+
+        // Filter by phase
+        if ($request->filled('phase')) {
+            $query->where('phase', $request->input('phase'));
+        }
+
+        $colleges = $query->orderBy('college_id')->paginate(10)->withQueryString();
         return view('admin.colleges.index', compact('colleges'));
     }
 

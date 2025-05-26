@@ -14,9 +14,26 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('college')->orderBy('user_id')->paginate(10);
+        $query = User::with('college');
+
+        // Filter by role
+        if ($request->filled('role')) {
+            $query->where('role', $request->input('role'));
+        }
+
+        // Filter by college_id
+        if ($request->filled('college_id')) {
+            $query->where('college_id', $request->input('college_id'));
+        }
+
+        // Filter by username
+        if ($request->filled('username')) {
+            $query->where('username', 'like', '%' . $request->input('username') . '%');
+        }
+
+        $users = $query->orderBy('user_id')->paginate(10)->withQueryString();
         return view('admin.users.index', compact('users'));
     }
 

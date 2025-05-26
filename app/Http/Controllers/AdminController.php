@@ -27,9 +27,21 @@ class AdminController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $admins = Admin::orderBy('admin_id')->paginate(10);
+        $query = Admin::query();
+
+        // Filter by email
+        if ($request->filled('email')) {
+            $query->where('email', 'like', '%' . $request->input('email') . '%');
+        }
+
+        // Filter by phone_no
+        if ($request->filled('phone_no')) {
+            $query->where('phone_no', 'like', '%' . $request->input('phone_no') . '%');
+        }
+
+        $admins = $query->orderBy('admin_id')->paginate(10)->withQueryString();
         return view('admin.admins.index', compact('admins'));
     }
 

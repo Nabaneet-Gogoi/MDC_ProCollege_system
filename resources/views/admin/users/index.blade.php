@@ -19,6 +19,55 @@
         </div>
     @endif
 
+    <!-- Filter Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="bi bi-funnel me-1"></i>
+            Filter Users
+        </div>
+        <div class="card-body">
+            <form action="{{ route('admin.users.index') }}" method="GET">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="role" class="form-label">Role</label>
+                        <select class="form-select" id="role" name="role">
+                            <option value="">All Roles</option>
+                            <option value="rusa" {{ request('role') == 'rusa' ? 'selected' : '' }}>RUSA</option>
+                            <option value="college" {{ request('role') == 'college' ? 'selected' : '' }}>College</option>
+                            {{-- Add other roles if any --}}
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="college_id" class="form-label">College</label>
+                        <select class="form-select" id="college_id" name="college_id">
+                            <option value="">All Colleges</option>
+                            @foreach($users->pluck('college')->filter()->unique('college_id')->sortBy('college_name') as $college)
+                                <option value="{{ $college->college_id }}" {{ request('college_id') == $college->college_id ? 'selected' : '' }}>
+                                    {{ $college->college_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" value="{{ request('username') }}" placeholder="Search by username">
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-end">
+                    <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-x-circle"></i> Clear Filters
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-funnel"></i> Apply Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="card mb-4">
         <div class="card-header">
             <i class="bi bi-table me-1"></i>

@@ -26,6 +26,37 @@
         </div>
     @endif
 
+    <!-- Filter Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="bi bi-funnel me-1"></i>
+            Filter Admins
+        </div>
+        <div class="card-body">
+            <form action="{{ route('admin.admins.index') }}" method="GET">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="text" class="form-control" id="email" name="email" value="{{ request('email') }}" placeholder="Search by email">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="phone_no" class="form-label">Phone Number</label>
+                        <input type="text" class="form-control" id="phone_no" name="phone_no" value="{{ request('phone_no') }}" placeholder="Search by phone number">
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-end">
+                    <a href="{{ route('admin.admins.index') }}" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-x-circle"></i> Clear Filters
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-funnel"></i> Apply Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-header">
             <i class="bi bi-people me-1"></i> Admin Accounts

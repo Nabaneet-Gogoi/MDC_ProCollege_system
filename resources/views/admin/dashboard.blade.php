@@ -106,7 +106,7 @@
     
     <!-- Funding Overview Cards -->
     <div class="row mb-4">
-        <div class="col-lg-6 mb-4">
+        <!-- <div class="col-lg-6 mb-4">
             <div class="card h-100 bg-success text-white shadow">
                 <div class="card-header bg-success border-0 py-3">
                     <h5 class="mb-0 fw-bold text-white"><i class="bi bi-graph-up me-2"></i> Fund Utilization</h5>
@@ -128,7 +128,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         
         <div class="col-lg-6 mb-4">
             <div class="card h-100">

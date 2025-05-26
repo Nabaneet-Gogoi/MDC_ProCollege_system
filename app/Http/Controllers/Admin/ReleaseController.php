@@ -13,9 +13,51 @@ class ReleaseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $releases = Release::with(['funding', 'funding.college'])->latest()->get();
+        $query = Release::with(['funding', 'funding.college']);
+
+        // Filter by college_id
+        if ($request->filled('college_id')) {
+            $query->whereHas('funding.college', function ($q) use ($request) {
+                $q->where('college_id', $request->input('college_id'));
+            });
+        }
+
+        // Filter by release date from
+        if ($request->filled('date_from')) {
+            $query->whereDate('release_date', '>=', $request->input('date_from'));
+        }
+
+        // Filter by release date to
+        if ($request->filled('date_to')) {
+            $query->whereDate('release_date', '<=', $request->input('date_to'));
+        }
+
+        // Filter by min amount
+        if ($request->filled('min_amount')) {
+            $query->where('release_amt', '>=', $request->input('min_amount'));
+        }
+
+        // Filter by max amount
+        if ($request->filled('max_amount')) {
+            $query->where('release_amt', '<=', $request->input('max_amount'));
+        }
+        
+        // Filter by utilization status
+        if ($request->filled('utilization_status')) {
+            $statusRange = explode('-', $request->input('utilization_status'));
+            $query->whereHas('funding', function ($q) use ($statusRange) {
+                if (count($statusRange) == 2) {
+                    $q->where('utilization_percentage', '>=', $statusRange[0])
+                      ->where('utilization_percentage', '<=', $statusRange[1]);
+                } elseif ($statusRange[0] == '100') {
+                    $q->where('utilization_percentage', '>=', 100);
+                } 
+            });
+        }
+
+        $releases = $query->latest()->paginate(10)->withQueryString();
         return view('admin.releases.index', compact('releases'));
     }
 

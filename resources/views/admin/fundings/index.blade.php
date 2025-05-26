@@ -17,6 +17,83 @@
         </div>
     @endif
 
+    <!-- Filter Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="bi bi-funnel me-1"></i>
+            Filter Funding Allocations
+        </div>
+        <div class="card-body">
+            <form action="{{ route('admin.fundings.index') }}" method="GET">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="college_id" class="form-label">College</label>
+                        <select class="form-select" id="college_id" name="college_id">
+                            <option value="">All Colleges</option>
+                            @foreach($fundings->pluck('college')->unique('college_id') as $college)
+                                <option value="{{ $college->college_id }}" {{ request('college_id') == $college->college_id ? 'selected' : '' }}>
+                                    {{ $college->college_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-2 mb-3">
+                        <label for="type" class="form-label">Type</label>
+                        <select class="form-select" id="type" name="type">
+                            <option value="">All Types</option>
+                            <option value="professional" {{ request('type') == 'professional' ? 'selected' : '' }}>Professional</option>
+                            <option value="MDC" {{ request('type') == 'MDC' ? 'selected' : '' }}>MDC</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-2 mb-3">
+                        <label for="phase" class="form-label">Phase</label>
+                        <select class="form-select" id="phase" name="phase">
+                            <option value="">All Phases</option>
+                            @foreach($fundings->pluck('college.phase')->filter()->unique()->sort() as $phase)
+                                <option value="{{ $phase }}" {{ request('phase') == $phase ? 'selected' : '' }}>
+                                    Phase {{ $phase }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-2 mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">All Statuses</option>
+                            <option value="not_started" {{ request('status') == 'not_started' ? 'selected' : '' }}>Not Started</option>
+                            <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                            <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <label for="min_amount" class="form-label">Min Amount (Cr)</label>
+                        <input type="number" step="0.01" class="form-control" id="min_amount" name="min_amount" value="{{ request('min_amount') }}" placeholder="0.00">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="max_amount" class="form-label">Max Amount (Cr)</label>
+                        <input type="number" step="0.01" class="form-control" id="max_amount" name="max_amount" value="{{ request('max_amount') }}" placeholder="1000.00">
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-end">
+                    <a href="{{ route('admin.fundings.index') }}" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-x-circle"></i> Clear Filters
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-funnel"></i> Apply Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-header">
             <i class="bi bi-table me-1"></i> Funding Allocations List

@@ -17,6 +17,73 @@
         </div>
     @endif
 
+    <!-- Filter Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="bi bi-funnel me-1"></i>
+            Filter Colleges
+        </div>
+        <div class="card-body">
+            <form action="{{ route('admin.colleges.index') }}" method="GET">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="state" class="form-label">State</label>
+                        <select class="form-select" id="state" name="state">
+                            <option value="">All States</option>
+                            @foreach($colleges->pluck('state')->unique()->sort() as $state)
+                                <option value="{{ $state }}" {{ request('state') == $state ? 'selected' : '' }}>
+                                    {{ $state }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <label for="district" class="form-label">District</label>
+                        <select class="form-select" id="district" name="district">
+                            <option value="">All Districts</option>
+                            @foreach($colleges->pluck('district')->unique()->sort() as $district)
+                                <option value="{{ $district }}" {{ request('district') == $district ? 'selected' : '' }}>
+                                    {{ $district }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <label for="type" class="form-label">College Type</label>
+                        <select class="form-select" id="type" name="type">
+                            <option value="">All Types</option>
+                            <option value="professional" {{ request('type') == 'professional' ? 'selected' : '' }}>Professional</option>
+                            <option value="MDC" {{ request('type') == 'MDC' ? 'selected' : '' }}>MDC</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <label for="phase" class="form-label">Phase</label>
+                        <select class="form-select" id="phase" name="phase">
+                            <option value="">All Phases</option>
+                            @foreach($colleges->whereNotNull('phase')->pluck('phase')->unique()->sort() as $phase)
+                                <option value="{{ $phase }}" {{ request('phase') == $phase ? 'selected' : '' }}>
+                                    Phase {{ $phase }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-end">
+                    <a href="{{ route('admin.colleges.index') }}" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-x-circle"></i> Clear Filters
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-funnel"></i> Apply Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-header">
             <i class="bi bi-table me-1"></i> Colleges List
