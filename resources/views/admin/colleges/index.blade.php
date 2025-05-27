@@ -387,7 +387,7 @@
             </div>
             <div class="stat-content">
                 <h3>{{ $colleges->where('type', 'MDC')->count() }}</h3>
-                <p>MDC Colleges</p>
+                <p>Model Degree Colleges</p>
             </div>
         </div>
     </div>
