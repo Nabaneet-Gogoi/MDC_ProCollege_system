@@ -459,7 +459,7 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person-circle me-2"></i>{{ Auth::user()->name ?? 'College User' }}
+                            <i class="bi bi-person-circle me-2"></i>{{ Auth::user()->college->college_name ?? Auth::user()->username ?? 'User' }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{{ route('college.profile.index') }}"><i class="bi bi-person"></i> Profile</a></li>
@@ -600,12 +600,6 @@
                     }
                 });
             }
-
-            // Add page transition effects
-            window.addEventListener('beforeunload', function() {
-                document.body.style.opacity = '0';
-                document.body.style.transform = 'translateY(-20px)';
-            });
         });
     </script>
     @yield('scripts')
