@@ -27,22 +27,22 @@ This document outlines the comprehensive modernization changes applied to the RU
 
 ### **New RUSA-Themed Primary Gradient**
 ```css
---primary-gradient: linear-gradient(135deg, #FFE03B 0%, #FDB813 30%, #F7941D 70%, #D1322D 100%);
+--rusa-gradient: linear-gradient(135deg, #D1322D 0%, #F7941D 30%, #FDB813 70%, #FFE03B 100%);
 ```
 
 **Represents:**
-- `#FFE03B` (Bright Yellow) - Innovation and creativity
-- `#FDB813` (Golden Yellow) - Excellence and achievement
+- `#D1322D` (Dynamic Red) - Passion and determination (base)
 - `#F7941D` (Vibrant Orange) - Energy and progress
-- `#D1322D` (Dynamic Red) - Passion and determination
+- `#FDB813` (Golden Yellow) - Excellence and achievement
+- `#FFE03B` (Bright Yellow) - Innovation and creativity (highlight)
 
 ### **Supporting Gradients**
 ```css
 --success-gradient: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
---warning-gradient: linear-gradient(135deg, #FFE03B 0%, #FDB813 50%, #F7941D 100%);
+--warning-gradient: linear-gradient(135deg, #F7941D 0%, #FDB813 50%, #FFE03B 100%);
 --info-gradient: linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%);
 --danger-gradient: linear-gradient(135deg, #D1322D 0%, #ef4444 50%, #f87171 100%);
---secondary-gradient: linear-gradient(135deg, #F7941D 0%, #FDB813 50%, #FFE03B 100%);
+--secondary-gradient: linear-gradient(135deg, #FFE03B 0%, #FDB813 50%, #F7941D 100%);
 ```
 
 ---
@@ -216,10 +216,10 @@ enhanced typography and spacing;
 ```css
 /* Desktop First Approach */
 1400px+: Full layout with large chart
-1200px:  Reduced sizes, maintained layout
-992px:   Stack layout, optimized spacing
-768px:   Mobile layout, compact elements
-576px:   Ultra-compact, centered elements
+1200px:   Reduced sizes, maintained layout
+992px:    Stack layout, optimized spacing
+768px:    Mobile layout, compact elements
+576px:    Ultra-compact, centered elements
 ```
 
 ### **Mobile Optimizations**

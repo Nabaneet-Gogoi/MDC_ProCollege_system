@@ -36,9 +36,9 @@ class AdminController extends Controller
             $query->where('email', 'like', '%' . $request->input('email') . '%');
         }
 
-        // Filter by phone_no
-        if ($request->filled('phone_no')) {
-            $query->where('phone_no', 'like', '%' . $request->input('phone_no') . '%');
+        // Filter by name
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->input('name') . '%');
         }
 
         $admins = $query->orderBy('admin_id')->paginate(10)->withQueryString();
@@ -59,9 +59,10 @@ class AdminController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:admins,email',
+            'username' => 'required|string|max:255|unique:admins,username',
             'password' => 'required|min:8|confirmed',
-            'phone_no' => 'required|string|max:15',
         ]);
 
         Admin::create($validated);
@@ -92,8 +93,9 @@ class AdminController extends Controller
     public function update(Request $request, Admin $admin)
     {
         $validated = $request->validate([
+            'name' => 'required|string|max:255',
             'email' => ['required', 'email', Rule::unique('admins', 'email')->ignore($admin->admin_id, 'admin_id')],
-            'phone_no' => 'required|string|max:15',
+            'username' => ['required', 'string', 'max:255', Rule::unique('admins', 'username')->ignore($admin->admin_id, 'admin_id')],
             'password' => 'nullable|min:8|confirmed',
         ]);
 

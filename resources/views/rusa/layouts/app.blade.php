@@ -167,6 +167,13 @@
             z-index: 1;
         }
         
+        /* Icon styling for navbar brand */
+        .navbar-brand i {
+            color: #2d3748 !important;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+            margin-right: 8px;
+        }
+        
         .navbar .nav-link {
             color: rgba(255, 255, 255, 0.95) !important;
             font-weight: 500;
@@ -175,9 +182,21 @@
             z-index: 1;
         }
         
+        /* Icon styling for nav links */
+        .navbar .nav-link i {
+            color: #2d3748 !important;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+            margin-right: 6px;
+        }
+        
         .navbar .nav-link:hover {
             color: #fff !important;
             transform: translateY(-1px);
+        }
+        
+        .navbar .nav-link:hover i {
+            color: #1a202c !important;
+            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.7);
         }
         
         .dropdown-menu {

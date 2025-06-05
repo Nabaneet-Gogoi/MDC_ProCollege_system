@@ -577,8 +577,8 @@
             </div>
             <div class="modern-card-title">
                 Filter & Search Admins
-                @if(request('email') || request('phone_no'))
-                    <span class="badge bg-primary ms-2">{{ (request('email') ? 1 : 0) + (request('phone_no') ? 1 : 0) }} filter(s) active</span>
+                @if(request('email') || request('name'))
+                    <span class="badge bg-primary ms-2">{{ (request('email') ? 1 : 0) + (request('name') ? 1 : 0) }} filter(s) active</span>
                 @endif
             </div>
             <div class="modern-card-header-decoration"></div>
@@ -594,11 +594,11 @@
                                value="{{ request('email') }}" placeholder="Search by email address">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="phone_no" class="modern-form-label">
-                            <i class="bi bi-telephone me-2"></i>Phone Number
+                        <label for="name" class="modern-form-label">
+                            <i class="bi bi-person me-2"></i>Name
                         </label>
-                        <input type="text" class="modern-form-control" id="phone_no" name="phone_no" 
-                               value="{{ request('phone_no') }}" placeholder="Search by phone number">
+                        <input type="text" class="modern-form-control" id="name" name="name" 
+                               value="{{ request('name') }}" placeholder="Search by name">
                     </div>
                 </div>
                 
@@ -630,8 +630,9 @@
                         <thead>
                             <tr>
                                 <th>Admin ID</th>
+                                <th>Name</th>
                                 <th>Email Address</th>
-                                <th>Phone Number</th>
+                                <th>Username</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -642,10 +643,13 @@
                                         <span class="modern-table-id">{{ $admin->admin_id }}</span>
                                     </td>
                                     <td>
+                                        <div class="modern-table-name">{{ $admin->name }}</div>
+                                    </td>
+                                    <td>
                                         <div class="modern-table-email">{{ $admin->email }}</div>
                                     </td>
                                     <td>
-                                        <div class="modern-table-phone">{{ $admin->phone_no }}</div>
+                                        <div class="modern-table-username">{{ $admin->username }}</div>
                                     </td>
                                     <td>
                                         <div class="modern-action-group">

@@ -353,22 +353,22 @@
             <form action="{{ route('admin.admins.store') }}" method="POST">
                 @csrf
                 
-                <!-- Email Field -->
+                <!-- Name Field -->
                 <div class="modern-form-group">
-                    <label for="email" class="modern-form-label">
-                        <i class="bi bi-envelope"></i>
-                        Email Address 
+                    <label for="name" class="modern-form-label">
+                        <i class="bi bi-person"></i>
+                        Full Name 
                         <span class="required">*</span>
                     </label>
-                    <input type="email" 
-                           class="modern-form-control @error('email') is-invalid @enderror" 
-                           id="email" 
-                           name="email" 
-                           value="{{ old('email') }}" 
+                    <input type="text" 
+                           class="modern-form-control @error('name') is-invalid @enderror" 
+                           id="name" 
+                           name="name" 
+                           value="{{ old('name') }}" 
                            required
-                           placeholder="Enter email address">
-                    <div class="modern-form-hint">This will be used as the login username</div>
-                    @error('email')
+                           placeholder="Enter full name">
+                    <div class="modern-form-hint">Enter the administrator's full name</div>
+                    @error('name')
                         <div class="modern-invalid-feedback">
                             <i class="bi bi-exclamation-circle"></i>
                             {{ $message }}
@@ -376,27 +376,51 @@
                     @enderror
                 </div>
                 
-                <!-- Phone Number Field -->
-                <div class="modern-form-group">
-                    <label for="phone_no" class="modern-form-label">
-                        <i class="bi bi-telephone"></i>
-                        Phone Number 
-                        <span class="required">*</span>
-                    </label>
-                    <input type="text" 
-                           class="modern-form-control @error('phone_no') is-invalid @enderror" 
-                           id="phone_no" 
-                           name="phone_no" 
-                           value="{{ old('phone_no') }}" 
-                           required
-                           placeholder="Enter phone number">
-                    <div class="modern-form-hint">Include country code (e.g., +1234567890)</div>
-                    @error('phone_no')
-                        <div class="modern-invalid-feedback">
-                            <i class="bi bi-exclamation-circle"></i>
-                            {{ $message }}
-                        </div>
-                    @enderror
+                <!-- Email and Username Fields -->
+                <div class="modern-form-row">
+                    <div class="modern-form-group">
+                        <label for="email" class="modern-form-label">
+                            <i class="bi bi-envelope"></i>
+                            Email Address 
+                            <span class="required">*</span>
+                        </label>
+                        <input type="email" 
+                               class="modern-form-control @error('email') is-invalid @enderror" 
+                               id="email" 
+                               name="email" 
+                               value="{{ old('email') }}" 
+                               required
+                               placeholder="Enter email address">
+                        <div class="modern-form-hint">This will be used for login and notifications</div>
+                        @error('email')
+                            <div class="modern-invalid-feedback">
+                                <i class="bi bi-exclamation-circle"></i>
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                    
+                    <div class="modern-form-group">
+                        <label for="username" class="modern-form-label">
+                            <i class="bi bi-at"></i>
+                            Username 
+                            <span class="required">*</span>
+                        </label>
+                        <input type="text" 
+                               class="modern-form-control @error('username') is-invalid @enderror" 
+                               id="username" 
+                               name="username" 
+                               value="{{ old('username') }}" 
+                               required
+                               placeholder="Enter username">
+                        <div class="modern-form-hint">Unique username for login</div>
+                        @error('username')
+                            <div class="modern-invalid-feedback">
+                                <i class="bi bi-exclamation-circle"></i>
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
                 </div>
                 
                 <!-- Password Fields -->

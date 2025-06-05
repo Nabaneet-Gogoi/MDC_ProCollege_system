@@ -4,19 +4,6 @@
 
 @section('content')
 <style>
-:root {
-    --rusa-primary: #FFE03B;
-    --rusa-secondary: #FDB813;
-    --rusa-tertiary: #F7941D;
-    --rusa-accent: #D1322D;
-    --rusa-gradient: linear-gradient(135deg, #FFE03B 0%, #FDB813 30%, #F7941D 70%, #D1322D 100%);
-    --success-gradient: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
-    --warning-gradient: linear-gradient(135deg, #FFE03B 0%, #FDB813 50%, #F7941D 100%);
-    --info-gradient: linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%);
-    --danger-gradient: linear-gradient(135deg, #D1322D 0%, #ef4444 50%, #f87171 100%);
-    --secondary-gradient: linear-gradient(135deg, #F7941D 0%, #FDB813 50%, #FFE03B 100%);
-}
-
 .rusa-header {
     background: var(--rusa-gradient);
     color: white;
